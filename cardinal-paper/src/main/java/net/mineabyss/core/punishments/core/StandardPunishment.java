@@ -4,32 +4,65 @@ import net.mineabyss.cardinal.api.punishments.Punishable;
 import net.mineabyss.cardinal.api.punishments.Punishment;
 import net.mineabyss.cardinal.api.punishments.PunishmentID;
 import net.mineabyss.cardinal.api.punishments.PunishmentIssuer;
+import net.mineabyss.cardinal.api.punishments.PunishmentRevision;
 import net.mineabyss.cardinal.api.punishments.PunishmentType;
+import net.mineabyss.core.storage.mongo.mapping.ExcludeField;
+import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public final class StandardPunishment<T> implements Punishment<T> {
 
     private final @NotNull PunishmentID id;
+
+    @ExcludeField
     private final @NotNull PunishmentType type;
+
     private final @NotNull Punishable<T> target;
+
     private final @NotNull PunishmentIssuer issuer;
-    private final @Nullable String reason;
+
+    private @Nullable String reason;
 
     private final Instant issuedAt;
-    private final Duration duration;
-    private final Instant expiresAt;
+    private Duration duration;
+    private Instant expiresAt;
 
     private final List<String> notes = new ArrayList<>();
+    private final List<PunishmentRevision> revisions = new ArrayList<>();
 
     private RevocationInfo revocationInfo;
 
-    StandardPunishment(
+    public StandardPunishment(
+            @NotNull PunishmentID id,
+            @NotNull PunishmentType type,
+            @NotNull Punishable<T> target,
+            @NotNull PunishmentIssuer issuer,
+            @Nullable String reason,
+            @NotNull Instant issuedAt,
+            @NotNull Duration duration,
+            @NotNull Instant expiresAt
+    ) {
+        this.id = id;
+        this.type = type;
+        this.target = target;
+        this.issuer = issuer;
+        this.reason = reason;
+
+        this.issuedAt = issuedAt;
+        this.duration = duration;
+        this.expiresAt = expiresAt;
+        createInitialRevision();
+    }
+
+    public StandardPunishment(
             @NotNull PunishmentID id,
             @NotNull PunishmentType type,
             @NotNull Punishable<T> target,
@@ -47,54 +80,17 @@ public final class StandardPunishment<T> implements Punishment<T> {
         this.issuedAt = issuedAt;
         this.duration = duration;
         this.expiresAt = issuedAt.plus(duration);
+        createInitialRevision();
     }
 
-    StandardPunishment(
+    public StandardPunishment(
             @NotNull PunishmentType type,
             @NotNull Punishable<T> target,
             @NotNull PunishmentIssuer issuer,
-            @Nullable String reason,
-            @NotNull Instant issuedAt,
-            @NotNull Duration duration
-    ) {
-        this(new StandardPunishmentID(), type, target, issuer, reason, issuedAt, duration);
-    }
-
-
-    StandardPunishment(
-            @NotNull PunishmentID id,
-            @NotNull PunishmentType type,
-            @NotNull Punishable<T> target,
-            @NotNull PunishmentIssuer issuer,
+            @NotNull Duration duration,
             @Nullable String reason
     ) {
-        this(id, type, target, issuer, reason, Instant.now(), Duration.ZERO);
-    }
-
-    StandardPunishment(
-            @NotNull PunishmentType type,
-            @NotNull Punishable<T> target,
-            @NotNull PunishmentIssuer issuer,
-            @Nullable String reason
-    ) {
-        this(type, target, issuer, reason, Instant.now(), Duration.ZERO);
-    }
-
-    StandardPunishment(
-            @NotNull PunishmentID id,
-            @NotNull PunishmentType type,
-            @NotNull Punishable<T> target,
-            @NotNull PunishmentIssuer issuer
-    ) {
-        this(id, type, target, issuer, null);
-    }
-
-    StandardPunishment(
-            @NotNull PunishmentType type,
-            @NotNull Punishable<T> target,
-            @NotNull PunishmentIssuer issuer
-    ) {
-        this(type, target, issuer, null);
+        this(new StandardPunishmentID(), type, target, issuer, reason, Instant.now(), duration);
     }
 
     /**
@@ -206,25 +202,35 @@ public final class StandardPunishment<T> implements Punishment<T> {
         return notes;
     }
 
-    /**
-     * Adds a new note to the punished player or entity's record.
-     * Notes are typically used to store contextual or historical information
-     * about punishments or player behavior that may not warrant a formal punishment.
-     *
-     * @param note the note to add; should not be null or empty.
-     */
     @Override
     public void addNote(@NotNull String note) {
+        Validate.notBlank(note, "note cannot be blank");
         this.notes.add(note);
+
+        addRevision(PunishmentRevision.builder(this.id, PunishmentRevision.RevisionType.NOTE_ADDED)
+                .issuer(this.issuer)
+                .newValue(note)
+                .reason("Note added to punishment record")
+                .build());
     }
 
-    /**
-     * Clears all existing notes from the punished player or entity's record.
-     * This action is irreversible and should be used with caution.
-     */
     @Override
     public void clearNotes() {
+        if (!notes.isEmpty()) {
+            int count = notes.size();
+            notes.clear();
+
+            addRevision(PunishmentRevision.builder(this.id, PunishmentRevision.RevisionType.NOTES_CLEARED)
+                    .issuer(this.issuer)
+                    .reason("Cleared " + count + " notes from punishment record")
+                    .build());
+        }
+    }
+
+    @Override
+    public void setNotesTo(List<String> notes) {
         this.notes.clear();
+        this.notes.addAll(notes);
     }
 
     /**
@@ -255,7 +261,159 @@ public final class StandardPunishment<T> implements Punishment<T> {
      */
     @Override
     public void revoke(@NotNull RevocationInfo revocationInfo) {
+        Validate.notNull(revocationInfo, "revocationInfo cannot be null");
+        this.revocationInfo = revocationInfo;
+
+        addRevision(PunishmentRevision.builder(this.id, PunishmentRevision.RevisionType.REVOKED)
+                .issuer(revocationInfo.getRevoker())
+                .reason(revocationInfo.getReason())
+                .build());
+    }
+
+    /**
+     * Sets the reason of a punishment
+     *
+     * @param newReason the new reason to set for the punishment
+     */
+    @Override
+    public void setReason(@Nullable String newReason) {
+        PunishmentRevision.Builder builder = PunishmentRevision.builder(this.id, PunishmentRevision.RevisionType.REASON_UPDATED)
+                .issuer(this.issuer)
+                .oldValue(this.reason)
+                .newValue(newReason);
+
+        if (this.reason != null && newReason != null) {
+            builder.reason("Reason updated from '" + this.reason + "' to '" + newReason + "'");
+        } else if (newReason != null) {
+            builder.reason("Reason set to: " + newReason);
+        } else {
+            builder.reason("Reason cleared");
+        }
+
+        this.reason = newReason;
+        addRevision(builder.build());
+    }
+
+    /**
+     * Retrieves the immutable list of revision history for this punishment.
+     * Each revision represents a modification to the punishment.
+     *
+     * @return an immutable list of punishment revisions
+     */
+    @NotNull
+    public List<PunishmentRevision> getRevisions() {
+        return Collections.unmodifiableList(revisions);
+    }
+
+    /**
+     * Adds a new revision to this punishment's history.
+     * This should be called whenever any significant change is made to the punishment.
+     *
+     * @param revision the revision to add
+     */
+    @Override
+    public void addRevision(@NotNull PunishmentRevision revision) {
+        Validate.notNull(revision, "revision cannot be null");
+        revisions.add(revision);
+    }
+
+    /**
+     * @return Whether the punishment is permanent or not.
+     */
+    @Override
+    public boolean isPermanent() {
+        return duration.isNegative() || duration.isZero();
+    }
+
+    @Override
+    public void setRevokeInfo(@Nullable RevocationInfo revocationInfo) {
         this.revocationInfo = revocationInfo;
     }
 
+    @Override
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+        this.expiresAt = issuedAt.plus(this.duration);
+    }
+
+    /**
+     * Creates the initial revision when the punishment is first created.
+     */
+    private void createInitialRevision() {
+        String reasonMsg = this.reason != null ?
+                "Punishment created with reason: " + this.reason :
+                "Punishment created without reason";
+
+        addRevision(PunishmentRevision.builder(this.id, PunishmentRevision.RevisionType.CREATED)
+                .issuer(this.issuer)
+                .reason(reasonMsg)
+                .newDuration(this.duration)
+                .build());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof StandardPunishment<?> that)) {
+            return false;
+        }
+        return Objects.equals(id.getRepresentation(), that.id.getRepresentation());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id.getRepresentation());
+    }
+
+
+    public static final class StandardRevocationInfo implements Punishment.RevocationInfo {
+
+        private final PunishmentIssuer revoker;
+        private Instant revokedAt = Instant.now();
+        private final String reason;
+
+        public StandardRevocationInfo(PunishmentIssuer revoker, String reason) {
+            this.revoker = revoker;
+            this.reason = reason;
+        }
+
+        public StandardRevocationInfo(PunishmentIssuer revoker, Instant revokedAt, String reason) {
+            this.revoker = revoker;
+            this.revokedAt = revokedAt;
+            this.reason = reason;
+        }
+
+
+        /**
+         * Gets the issuer who revoked the punishment.
+         *
+         * @return the revoker
+         */
+        @NotNull
+        @Override
+        public PunishmentIssuer getRevoker() {
+            return revoker;
+        }
+
+        /**
+         * Gets the timestamp when the punishment was revoked.
+         *
+         * @return the revocation timestamp
+         */
+        @NotNull
+        @Override
+        public Instant getRevokedAt() {
+            return revokedAt;
+        }
+
+        /**
+         * Gets the reason for revocation.
+         *
+         * @return the revocation reason
+         */
+        @NotNull
+        @Override
+        public String getReason() {
+            return reason;
+        }
+    }
 }

@@ -30,6 +30,13 @@ public interface PunishmentIssuer {
     @NotNull IssuerType getType();
 
     /**
+     * Checks if issuer has specific permission
+     * @param permission the specific permission
+     * @return whether the issuer has a specific permission
+     */
+    boolean hasPermission(String permission);
+
+    /**
      * Checks if the issuer is a console.
      * @return true if the issuer is a console, false otherwise
      */
@@ -44,4 +51,6 @@ public interface PunishmentIssuer {
     default boolean isPlayer() {
         return getType().isPlayer();
     }
+
+    void sendMsg(String msg);
 }

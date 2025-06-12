@@ -1,6 +1,9 @@
 package net.mineabyss.cardinal.api.punishments;
 
+import net.mineabyss.cardinal.api.storage.DBEntity;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -12,7 +15,11 @@ import java.util.Optional;
  *
  * @param <T> the type of the target entity (e.g., Player, IPAddress)
  */
-public interface Punishment<T> {
+public interface Punishment<T> extends DBEntity<String> {
+
+    default @NotNull @Override String getEntityID() {
+        return getId().getRepresentation();
+    }
 
     /**
      * Returns the unique identifier for this punishment.
@@ -111,6 +118,12 @@ public interface Punishment<T> {
     void clearNotes();
 
     /**
+     * Sets all the notes to the given list of notes.
+     * @param notes the notes to set.
+     */
+    void setNotesTo(List<String> notes);
+
+    /**
      * Checks if this punishment has been revoked.
      *
      * @return true if revoked, false otherwise
@@ -130,6 +143,45 @@ public interface Punishment<T> {
      */
     void revoke(@NotNull RevocationInfo revocationInfo);
 
+    /**
+     * Sets the reason of a punishment
+     * @param newReason the new reason to set for the punishment
+     */
+    void setReason(String newReason);
+
+    /**
+     * @return All revisions related to the {@link Punishment}
+     */
+    List<PunishmentRevision> getRevisions();
+
+    /**
+     * Adds a {@link PunishmentRevision} to the revisions.
+     */
+    void addRevision(@NotNull PunishmentRevision revision);
+
+    /**
+     * @return Whether the punishment is permanent or not.
+     */
+    boolean isPermanent();
+
+    /**
+     * Sets revocation info for the punishment
+     * sets it as a revoked/appealed punishment
+     * @param revocationInfo the revocation info
+     */
+    void setRevokeInfo(@Nullable RevocationInfo revocationInfo);
+
+    /**
+     * Sets the duration of the punishment,
+     * if set to ZERO or NEGATIVE, this punishment is treated as a permanent punishment.
+     * @param duration the duration of the punishment
+     */
+    void setDuration(Duration duration);
+
+    default boolean hasExpired() {
+        Instant expiresAt = this.getExpiresAt();
+        return !expiresAt.isAfter(Instant.now());
+    }
     /**
      * Information about a punishment revocation.
      */

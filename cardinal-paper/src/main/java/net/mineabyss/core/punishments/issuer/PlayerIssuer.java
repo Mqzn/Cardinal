@@ -2,6 +2,7 @@ package net.mineabyss.core.punishments.issuer;
 
 import net.mineabyss.cardinal.api.punishments.IssuerType;
 import net.mineabyss.cardinal.api.punishments.PunishmentIssuer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,6 +16,11 @@ public final class PlayerIssuer implements PunishmentIssuer {
     PlayerIssuer (@NotNull Player player) {
         this.name = player.getName();
         this.uniqueId = player.getUniqueId();
+    }
+
+    PlayerIssuer (@NotNull String name, UUID uuid) {
+        this.name = name;
+        this.uniqueId = uuid;
     }
 
 
@@ -38,6 +44,7 @@ public final class PlayerIssuer implements PunishmentIssuer {
         return uniqueId;
     }
 
+
     /**
      * Returns the type of this issuer.
      *
@@ -47,4 +54,24 @@ public final class PlayerIssuer implements PunishmentIssuer {
     public @NotNull IssuerType getType() {
         return IssuerType.PLAYER;
     }
+
+    @Override
+    public boolean hasPermission(String permission) {
+        Player player = Bukkit.getPlayer(uniqueId);
+        if(player == null) {
+            return false;
+        }
+        return player.hasPermission(permission);
+
+    }
+
+    @Override
+    public void sendMsg(String msg) {
+        Player player = Bukkit.getPlayer(uniqueId);
+        if(player != null) {
+            player.sendRichMessage(msg);
+        }
+    }
+
+
 }

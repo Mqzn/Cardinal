@@ -1,0 +1,17 @@
+storage:
+  type: MONGO
+  mongo:
+    uri: "mongodb://localhost:27017"
+    database: "cardinal_db"
+    collectionPrefix: "cardinal_"
+    maxPoolSize: 20
+    minPoolSize: 5
+    connectionTimeoutMs: 30000
+  mysql:
+    url: "jdbc:mysql://localhost:3306/app_db"
+    username: "user"
+    password: "password"
+    poolSize: 10
+    connectionTimeoutMs: 30000
+    maxLifetime: 1800000
+    autoCommit: false

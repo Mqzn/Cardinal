@@ -5,6 +5,7 @@ import net.mineabyss.cardinal.api.punishments.PunishableType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -50,10 +51,7 @@ final class IPTarget implements Punishable<String> {
      */
     @Override
     public @NotNull UUID getTargetUUID() {
-        if (target == null) {
-            throw new IllegalStateException("Target is null, cannot retrieve UUID");
-        }
-        return target.getTargetUUID();
+        return UUID.nameUUIDFromBytes(ipAddress.getBytes(StandardCharsets.UTF_8));
     }
 
     /**

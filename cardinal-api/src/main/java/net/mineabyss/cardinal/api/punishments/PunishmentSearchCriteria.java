@@ -23,7 +23,7 @@ public final class PunishmentSearchCriteria {
     private final @Nullable PunishmentType type;
     private final @Nullable PunishmentIssuer issuer;
     private final @Nullable UUID targetPlayerId;
-    private final @Nullable String reasonContains;
+    private final @Nullable String reason;
     private final @Nullable Instant issuedAfter;
     private final @Nullable Instant issuedBefore;
     private final @Nullable Instant expiresAfter;
@@ -41,7 +41,7 @@ public final class PunishmentSearchCriteria {
         this.type = builder.type;
         this.issuer = builder.issuer;
         this.targetPlayerId = builder.targetPlayerId;
-        this.reasonContains = builder.reasonContains;
+        this.reason = builder.reason;
         this.issuedAfter = builder.issuedAfter;
         this.issuedBefore = builder.issuedBefore;
         this.expiresAfter = builder.expiresAfter;
@@ -57,7 +57,7 @@ public final class PunishmentSearchCriteria {
     public @Nullable PunishmentType getType() { return type; }
     public @Nullable PunishmentIssuer getIssuer() { return issuer; }
     public @Nullable UUID getTargetPlayerId() { return targetPlayerId; }
-    public @Nullable String getReasonContains() { return reasonContains; }
+    public @Nullable String getReason() { return reason; }
     public @Nullable Instant getIssuedAfter() { return issuedAfter; }
     public @Nullable Instant getIssuedBefore() { return issuedBefore; }
     public @Nullable Instant getExpiresAfter() { return expiresAfter; }
@@ -93,7 +93,7 @@ public final class PunishmentSearchCriteria {
      */
     public boolean isEmpty() {
         return type == null && issuer == null && targetPlayerId == null &&
-               reasonContains == null && issuedAfter == null && issuedBefore == null &&
+               reason == null && issuedAfter == null && issuedBefore == null &&
                expiresAfter == null && expiresBefore == null && minDuration == null &&
                maxDuration == null && activeOnly == null && permanentOnly == null &&
                excludeTypes.isEmpty();
@@ -108,7 +108,7 @@ public final class PunishmentSearchCriteria {
         return Objects.equals(type, that.type) &&
                Objects.equals(issuer, that.issuer) &&
                Objects.equals(targetPlayerId, that.targetPlayerId) &&
-               Objects.equals(reasonContains, that.reasonContains) &&
+               Objects.equals(reason, that.reason) &&
                Objects.equals(issuedAfter, that.issuedAfter) &&
                Objects.equals(issuedBefore, that.issuedBefore) &&
                Objects.equals(expiresAfter, that.expiresAfter) &&
@@ -122,7 +122,7 @@ public final class PunishmentSearchCriteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, issuer, targetPlayerId, reasonContains, issuedAfter,
+        return Objects.hash(type, issuer, targetPlayerId, reason, issuedAfter,
                           issuedBefore, expiresAfter, expiresBefore, minDuration, maxDuration,
                           activeOnly, permanentOnly, excludeTypes);
     }
@@ -133,7 +133,7 @@ public final class PunishmentSearchCriteria {
                "type=" + type +
                ", issuer=" + issuer +
                ", targetPlayerId=" + targetPlayerId +
-               ", reasonContains='" + reasonContains + '\'' +
+               ", reasonContains='" + reason + '\'' +
                ", issuedAfter=" + issuedAfter +
                ", issuedBefore=" + issuedBefore +
                ", expiresAfter=" + expiresAfter +
@@ -157,7 +157,7 @@ public final class PunishmentSearchCriteria {
         private @Nullable PunishmentType type;
         private @Nullable PunishmentIssuer issuer;
         private @Nullable UUID targetPlayerId;
-        private @Nullable String reasonContains;
+        private @Nullable String reason;
         private @Nullable Instant issuedAfter;
         private @Nullable Instant issuedBefore;
         private @Nullable Instant expiresAfter;
@@ -174,7 +174,7 @@ public final class PunishmentSearchCriteria {
             this.type = criteria.type;
             this.issuer = criteria.issuer;
             this.targetPlayerId = criteria.targetPlayerId;
-            this.reasonContains = criteria.reasonContains;
+            this.reason = criteria.reason;
             this.issuedAfter = criteria.issuedAfter;
             this.issuedBefore = criteria.issuedBefore;
             this.expiresAfter = criteria.expiresAfter;
@@ -202,7 +202,7 @@ public final class PunishmentSearchCriteria {
         }
 
         public @NotNull Builder reasonContains(@Nullable String reasonContains) {
-            this.reasonContains = reasonContains != null && reasonContains.trim().isEmpty() ? null : reasonContains;
+            this.reason = reasonContains != null && reasonContains.trim().isEmpty() ? null : reasonContains;
             return this;
         }
 

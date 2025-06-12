@@ -2,6 +2,7 @@ package net.mineabyss.core.punishments.issuer;
 
 import net.mineabyss.cardinal.api.punishments.IssuerType;
 import net.mineabyss.cardinal.api.punishments.PunishmentIssuer;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -36,6 +37,11 @@ public final class ConsoleIssuer implements PunishmentIssuer {
         return "CONSOLE";
     }
 
+    @Override
+    public boolean hasPermission(String permission) {
+        return true;
+    }
+
     /**
      * Returns the unique identifier for this issuer.
      *
@@ -54,5 +60,10 @@ public final class ConsoleIssuer implements PunishmentIssuer {
     @Override
     public @NotNull IssuerType getType() {
         return IssuerType.CONSOLE;
+    }
+
+    @Override
+    public void sendMsg(String msg) {
+        Bukkit.getConsoleSender().sendRichMessage(msg);
     }
 }

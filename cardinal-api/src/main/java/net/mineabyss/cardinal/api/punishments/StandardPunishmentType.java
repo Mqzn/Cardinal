@@ -17,4 +17,5 @@ public enum StandardPunishmentType implements PunishmentType {
     public String id() {
         return id;
     }
+
 }

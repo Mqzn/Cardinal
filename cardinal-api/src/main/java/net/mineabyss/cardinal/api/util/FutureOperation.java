@@ -2,7 +2,6 @@ package net.mineabyss.cardinal.api.util;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -223,4 +222,9 @@ public final class FutureOperation<T> {
     public <U> FutureOperation<U> thenCompose(Function<T, CompletableFuture<U>> function) {
         return FutureOperation.of(future.thenCompose(function));
     }
+
+    public T join() {
+        return unwrap().join();
+    }
+
 }

@@ -12,4 +12,9 @@ public interface PunishmentType {
      */
     String id();
 
+    /**
+     * Full name may be uppercase if the implementation is an enum
+     * @return the full name
+     */
+    String name();
 }

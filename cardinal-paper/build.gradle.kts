@@ -47,6 +47,7 @@ dependencies {
 
     implementation(project(":cardinal-api"))
 
+
     compileOnly("com.comphenix.protocol:ProtocolLib:5.3.0")
     compileOnly("me.clip:placeholderapi:2.11.6")
 
@@ -83,8 +84,10 @@ tasks.shadowJar {
     //minimize();
     archiveClassifier.set("")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    destinationDirectory = project.rootProject.properties["shadowJarOutputDir"]?.let { file(it) }?.let { file(it) }
+    destinationDirectory = project.rootProject.properties["outputDir"]?.let { file(it) }?.let { file(it) }
     archiveFileName.set("Cardinal-${project.version}.jar")
+
+    relocate("com.github.benmanes", "net.mineabyss.core.lib.caffeine")
 }
 
 tasks.processResources {

@@ -14,5 +14,7 @@ repositories {
 }
 
 dependencies {
+
+    compileOnly(files("libs/MineAbyssLib-1.0b1.jar"))
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
 }
