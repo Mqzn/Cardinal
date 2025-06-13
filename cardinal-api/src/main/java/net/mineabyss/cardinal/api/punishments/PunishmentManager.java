@@ -545,4 +545,6 @@ public interface PunishmentManager {
      * @throws IllegalArgumentException if punishmentId is null
      */
     FutureOperation<Deque<PunishmentRevision>> getPunishmentRevisions(PunishmentID punishmentId);
+
+    void revokePunishmentFromMemory(Punishment<?> punishment);
 }

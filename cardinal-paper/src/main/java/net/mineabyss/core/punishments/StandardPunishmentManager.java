@@ -20,6 +20,7 @@ import net.mineabyss.cardinal.api.storage.Repository;
 import net.mineabyss.cardinal.api.storage.StorageEngine;
 import net.mineabyss.cardinal.api.storage.StorageException;
 import net.mineabyss.cardinal.api.util.FutureOperation;
+import net.mineabyss.core.Cardinal;
 import net.mineabyss.core.punishments.core.StandardPunishment;
 import net.mineabyss.core.punishments.issuer.PunishmentIssuerFactory;
 import net.mineabyss.core.storage.StorageEngines;
@@ -27,7 +28,6 @@ import net.mineabyss.core.util.IPUtils;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.AbstractMap;
@@ -248,29 +248,33 @@ public class StandardPunishmentManager implements PunishmentManager {
     public FutureOperation<Optional<Punishment<?>>> getActivePunishment(@NotNull UUID playerId, PunishmentType type) {
         PunishmentsCache punishmentsOfType = activePunishments.get(type, (k)-> new PunishmentsCache(type));
         if(punishmentsOfType != null) {
-            System.out.println("Found punishment cache for type " + type.name());
             Deque<Punishment<?>> userPunishments = punishmentsOfType.getPunishmentsIfPresent(playerId);
             if (userPunishments != null) {
-                System.out.println("Found punishment deque for type " + type.name());
-                Optional<Punishment<?>> activePunishment = Optional.ofNullable(userPunishments.getLast());
+                Optional<Punishment<?>> activePunishment = Optional.ofNullable(userPunishments.peekLast());
                 if (activePunishment.isPresent()) {
-                    System.out.println("Found active punishment in the deque");
-                    return FutureOperation.of(CompletableFuture.completedFuture(activePunishment));
+                    if(activePunishment.get().isRevoked() || activePunishment.get().hasExpired()) {
+                        removeActivePunishmentFromCache(activePunishment.get());
+                    }
+                    else {
+                        Cardinal.log("Fetched %s's from cached entries.", playerId.toString());
+                        return FutureOperation.completed(activePunishment);
+                    }
                 }
             }
-        }else {
-            System.out.println("NO PUNISHMENT CACHE OF TYPE " + type.name());
         }
+
         return FutureOperation.of(
                 CompletableFuture.supplyAsync(()-> {
                     try {
-                        System.out.println("Trying to fetch it from DB !!");
+                        Cardinal.log("Trying to fetch it from DB !!");
                         Optional<Punishment<?>> loadedActivePunishment = getPunishmentRepo(type).query()
                                 .where("target.type").eq("PLAYER")
                                 .and()
                                 .where("target.uuid").eq(playerId.toString())
                                 .and()
                                 .where("expiresAt").gt(Instant.now().toEpochMilli())
+                                .and()
+                                .where("revoke-info").eq(null)
                                 .limit(1)
                                 .findFirst();
 
@@ -1354,6 +1358,11 @@ public class StandardPunishmentManager implements PunishmentManager {
             }
             return new ArrayDeque<>();
         }));
+    }
+
+    @Override
+    public void revokePunishmentFromMemory(Punishment<?> punishment) {
+        removeActivePunishmentFromCache(punishment);
     }
 
     private void updateActivePunishment(Punishment<?> punishment) {

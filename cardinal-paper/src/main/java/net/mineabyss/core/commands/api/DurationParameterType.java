@@ -1,6 +1,7 @@
 package net.mineabyss.core.commands.api;
 
 import com.mineabyss.lib.commands.BukkitSource;
+import com.mineabyss.lib.commands.command.parameters.OptionalValueSupplier;
 import com.mineabyss.lib.commands.command.parameters.type.BaseParameterType;
 import com.mineabyss.lib.commands.context.ExecutionContext;
 import com.mineabyss.lib.commands.context.internal.CommandInputStream;
@@ -23,9 +24,15 @@ public class DurationParameterType extends BaseParameterType<BukkitSource, Durat
             @NotNull CommandInputStream<BukkitSource> inputStream,
             String input
     ) throws ImperatException {
-        if(!TimeUtil.isValidDurationFormat(input)) {
-            throw new CardinalSourceException("Invalid duration '%s'", input);
+        try{
+            return TimeUtil.parse(input);
+        }catch (Exception exception) {
+            throw new CardinalSourceException("<red>Invalid duration '%s'", input);
         }
-        return TimeUtil.parse(input);
+    }
+
+    @Override
+    public OptionalValueSupplier supplyDefaultValue() {
+        return OptionalValueSupplier.of("permanent");
     }
 }

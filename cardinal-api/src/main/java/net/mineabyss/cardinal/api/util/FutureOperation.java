@@ -2,6 +2,8 @@ package net.mineabyss.cardinal.api.util;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -24,6 +26,10 @@ public final class FutureOperation<T> {
      */
     public static <T> FutureOperation<T> of(CompletableFuture<T> future) {
         return new FutureOperation<>(future);
+    }
+
+    public static <T> FutureOperation<T> completed(@Nullable T value) {
+        return of(CompletableFuture.completedFuture(value));
     }
     
     /**

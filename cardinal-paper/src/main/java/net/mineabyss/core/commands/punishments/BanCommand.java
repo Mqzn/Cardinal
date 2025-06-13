@@ -12,6 +12,7 @@ import net.mineabyss.cardinal.api.punishments.Punishment;
 import net.mineabyss.cardinal.api.punishments.PunishmentIssuer;
 import net.mineabyss.cardinal.api.punishments.StandardPunishmentType;
 import net.mineabyss.core.Cardinal;
+import net.mineabyss.core.CardinalPermissions;
 import net.mineabyss.core.commands.api.CardinalSource;
 import net.mineabyss.core.punishments.target.PunishmentTargetFactory;
 import net.mineabyss.core.util.PunishmentMessageUtil;
@@ -33,7 +34,6 @@ public class BanCommand {
         sender.sendMsg("Usage: /ban <player> [-s] [duration] [reason]");
     }
 
-    private final static String OVERRIDE_PUNISHMENTS_PERMISSION = "cardinal.punishments.override";
 
     @Usage
     public void banPlayer(
@@ -51,7 +51,7 @@ public class BanCommand {
                 .unwrap().thenCompose((punishmentContainer)-> {
                             if(punishmentContainer.isPresent()) {
 
-                                if(issuer.hasPermission(OVERRIDE_PUNISHMENTS_PERMISSION)) {
+                                if(issuer.hasPermission(CardinalPermissions.OVERRIDE_PUNISHMENTS_PERMISSION)) {
                                     //let's override.
                                     Punishment<?> punishment = punishmentContainer.get();
                                     punishment.setReason(reason);
@@ -77,15 +77,7 @@ public class BanCommand {
                                                             PlayerKickEvent.Cause.BANNED);
                                                 });
                                             }
-
-                                            if(silent) {
-                                                //send only to the issuer
-
-                                            }else {
-                                                //send to all online players
-
-                                            }
-
+                                            PunishmentMessageUtil.broadcastPunishment(punishment, silent);
                                         }).unwrap()
                                         .thenApply(java.util.Optional::of);
                             }

@@ -11,7 +11,9 @@ import net.mineabyss.cardinal.api.punishments.PunishmentManager;
 import net.mineabyss.cardinal.api.storage.StorageException;
 import net.mineabyss.core.commands.api.CardinalSource;
 import net.mineabyss.core.commands.api.DurationParameterType;
+import net.mineabyss.core.commands.api.exceptions.CardinalSourceException;
 import net.mineabyss.core.commands.punishments.BanCommand;
+import net.mineabyss.core.commands.punishments.UnbanCommand;
 import net.mineabyss.core.listener.BanListener;
 import net.mineabyss.core.punishments.StandardPunishmentManager;
 import net.mineabyss.core.punishments.issuer.PunishmentIssuerFactory;
@@ -42,6 +44,9 @@ public final class Cardinal extends MineAbyssPlugin implements CardinalAPI {
                     }
                     return PunishmentIssuerFactory.fromPlayer(source.asPlayer());
                 }))
+                .throwableResolver(CardinalSourceException.class, (ex, imperat, context)-> {
+                    context.source().origin().sendRichMessage(ex.getMsg());
+                })
                 .parameterType(Duration.class, new DurationParameterType())
                 .build();
     }
@@ -50,7 +55,7 @@ public final class Cardinal extends MineAbyssPlugin implements CardinalAPI {
     protected void registerPluginCommands(@NotNull BukkitImperat bukkitImperat) {
 
         bukkitImperat.registerCommand(new BanCommand());
-
+        bukkitImperat.registerCommand(new UnbanCommand());
     }
 
     @Override
