@@ -3,6 +3,7 @@ package net.mineabyss.core.commands.punishments;
 import com.mineabyss.lib.commands.annotations.Command;
 import com.mineabyss.lib.commands.annotations.Default;
 import com.mineabyss.lib.commands.annotations.Description;
+import com.mineabyss.lib.commands.annotations.Greedy;
 import com.mineabyss.lib.commands.annotations.Named;
 import com.mineabyss.lib.commands.annotations.Optional;
 import com.mineabyss.lib.commands.annotations.Permission;
@@ -31,7 +32,7 @@ public class BanCommand {
 
     @Usage
     public void defaultUsage(CardinalSource sender) {
-        sender.sendMsg("Usage: /ban <player> [-s] [duration] [reason]");
+        sender.sendMsg("Usage: /ban <player> [-s] [duration] [reason...]");
     }
 
 
@@ -41,7 +42,7 @@ public class BanCommand {
             @Named("player") OfflinePlayer player,
             @Switch({"silent", "s"}) boolean silent,
             @Named("duration")@Default("0") @Nullable Duration duration,
-            @Named("reason") @Optional @Nullable String reason
+            @Named("reason") @Greedy @Optional @Nullable String reason
     ) {
         // /ban <player> [-s] [duration] [reason]
 

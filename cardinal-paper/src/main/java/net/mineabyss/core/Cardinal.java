@@ -9,12 +9,15 @@ import net.mineabyss.cardinal.api.CardinalAPI;
 import net.mineabyss.cardinal.api.punishments.PunishmentIssuer;
 import net.mineabyss.cardinal.api.punishments.PunishmentManager;
 import net.mineabyss.cardinal.api.storage.StorageException;
+import net.mineabyss.core.commands.punishments.UnMuteCommand;
 import net.mineabyss.core.commands.api.CardinalSource;
 import net.mineabyss.core.commands.api.DurationParameterType;
 import net.mineabyss.core.commands.api.exceptions.CardinalSourceException;
 import net.mineabyss.core.commands.punishments.BanCommand;
+import net.mineabyss.core.commands.punishments.MuteCommand;
 import net.mineabyss.core.commands.punishments.UnbanCommand;
 import net.mineabyss.core.listener.BanListener;
+import net.mineabyss.core.listener.MuteListener;
 import net.mineabyss.core.punishments.StandardPunishmentManager;
 import net.mineabyss.core.punishments.issuer.PunishmentIssuerFactory;
 import org.bukkit.Bukkit;
@@ -54,14 +57,19 @@ public final class Cardinal extends MineAbyssPlugin implements CardinalAPI {
     @Override
     protected void registerPluginCommands(@NotNull BukkitImperat bukkitImperat) {
 
-        bukkitImperat.registerCommand(new BanCommand());
-        bukkitImperat.registerCommand(new UnbanCommand());
+        bukkitImperat.registerCommands(
+                new BanCommand(),
+                new UnbanCommand(),
+                new MuteCommand(),
+                new UnMuteCommand()
+        );
     }
 
     @Override
     protected void registerPluginListeners() {
         Events.listen(this,
-                new BanListener()
+                new BanListener(),
+                new MuteListener()
         );
     }
 

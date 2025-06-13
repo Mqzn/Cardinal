@@ -11,23 +11,24 @@ import net.mineabyss.cardinal.api.punishments.StandardPunishmentType;
 import net.mineabyss.core.Cardinal;
 import net.mineabyss.core.commands.api.CardinalSource;
 import org.bukkit.OfflinePlayer;
+
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-@Command("unban")
-public class UnbanCommand {
+@Command("unmute")
+public final class UnMuteCommand {
 
     @Usage
     public void def(CardinalSource source) {
-        // /unban
-        source.sendMsg("<red>/Unban <user> [reason]");
+        source.sendMsg("<red>Unmute <user> [reason...]");
     }
 
     @Usage
-    public void exec(
+    public void unmute(
             PunishmentIssuer issuer,
             @Named("user")OfflinePlayer user,
-            @Optional @Greedy @Named("reason") String reason) {
+            @Named("reason") @Greedy @Optional String reason
+    ) {
 
         if(user.getName() == null) {
             issuer.sendMsg("<red>User doesn't exist !");
@@ -36,7 +37,7 @@ public class UnbanCommand {
 
         UUID userUUID = user.getUniqueId();
         Cardinal.getInstance().getPunishmentManager()
-                .getActivePunishment(userUUID, StandardPunishmentType.BAN)
+                .getActivePunishment(userUUID, StandardPunishmentType.MUTE)
                 .thenCompose((punishmentContainer)-> {
 
                     if(punishmentContainer.isEmpty()) {
@@ -53,14 +54,15 @@ public class UnbanCommand {
 
                     if(revoked) {
                         //send success to user
-                        issuer.sendMsg("<gray>Unbanned player <green>" + user.getName());
+                        issuer.sendMsg("<gray>Unmuted player <green>" + user.getName());
                     }
                     else {
-                        issuer.sendMsg("<dark_red>ERROR: <red>Player '" + user.getName() + "' is not banned !");
+                        issuer.sendMsg("<dark_red>ERROR: <red>Player '" + user.getName() + "' is not muted !");
                     }
                 });
 
     }
+
 
 
 }
