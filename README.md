@@ -24,7 +24,7 @@ A comprehensive and easy-to-use punishment plugin for Minecraft servers, designe
 
   ⬜ Punishment History System: View a player's complete punishment history (mutes, bans, warnings).
 
-  ⬜ Configurable Messages: Customize all punishment messages sent to players and staff.
+  ✅ Configurable Messages: Customize all punishment messages sent to players and staff.
 
   ✅ Mongo Database Integration.
   
