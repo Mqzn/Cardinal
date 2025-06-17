@@ -75,7 +75,6 @@ public final class DocumentMapper<T> {
         // Try to find a type adapter
         TypeAdapter<Object> adapter = (TypeAdapter<Object>) adapterRegistry.findAdapter(TypeWrap.of(valueClass));
         if (adapter != null) {
-            System.out.println("Found adapter for type= '" + valueClass.getName() + "'");
             return adapter.serialize(entityValue, context);
         }
 

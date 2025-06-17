@@ -4,11 +4,16 @@ import com.mineabyss.lib.ConfigLoader;
 import com.mineabyss.lib.Events;
 import com.mineabyss.lib.bootstrap.MineAbyssPlugin;
 import com.mineabyss.lib.commands.BukkitImperat;
+import com.mineabyss.lib.commands.util.TypeWrap;
 import lombok.Getter;
 import net.mineabyss.cardinal.api.CardinalAPI;
+import net.mineabyss.cardinal.api.CardinalProvider;
+import net.mineabyss.cardinal.api.config.MessageConfig;
+import net.mineabyss.cardinal.api.punishments.Punishable;
 import net.mineabyss.cardinal.api.punishments.PunishmentIssuer;
 import net.mineabyss.cardinal.api.punishments.PunishmentManager;
 import net.mineabyss.cardinal.api.storage.StorageException;
+import net.mineabyss.core.commands.api.PunishableParameterType;
 import net.mineabyss.core.commands.punishments.KickCommand;
 import net.mineabyss.core.commands.punishments.UnMuteCommand;
 import net.mineabyss.core.commands.api.CardinalSource;
@@ -17,6 +22,7 @@ import net.mineabyss.core.commands.api.exceptions.CardinalSourceException;
 import net.mineabyss.core.commands.punishments.BanCommand;
 import net.mineabyss.core.commands.punishments.MuteCommand;
 import net.mineabyss.core.commands.punishments.UnbanCommand;
+import net.mineabyss.core.config.YamlMessageConfig;
 import net.mineabyss.core.listener.BanListener;
 import net.mineabyss.core.listener.MuteListener;
 import net.mineabyss.core.punishments.StandardPunishmentManager;
@@ -30,6 +36,7 @@ public final class Cardinal extends MineAbyssPlugin implements CardinalAPI {
 
     @Getter private static Cardinal instance;
 
+    private MessageConfig config;
     private PunishmentManager punishmentManager;
 
     public Cardinal(
@@ -41,6 +48,7 @@ public final class Cardinal extends MineAbyssPlugin implements CardinalAPI {
     @Override
     public BukkitImperat loadImperat() {
         return BukkitImperat.builder(this)
+                .dependencyResolver(MessageConfig.class, ()-> config)
                 .sourceResolver(CardinalSource.class, CardinalSource::new)
                 .sourceResolver(PunishmentIssuer.class,(source -> {
                     if(source.isConsole()) {
@@ -52,6 +60,7 @@ public final class Cardinal extends MineAbyssPlugin implements CardinalAPI {
                     context.source().origin().sendRichMessage(ex.getMsg());
                 })
                 .parameterType(Duration.class, new DurationParameterType())
+                .parameterType(new TypeWrap<Punishable<?>>(){}.getType(), new PunishableParameterType())
                 .build();
     }
 
@@ -77,12 +86,20 @@ public final class Cardinal extends MineAbyssPlugin implements CardinalAPI {
     @Override
     protected void onPreStart() {
         instance = this;
+        CardinalProvider.load(instance);
 
         this.configLoader = ConfigLoader.builder("config.yml")
                 .parentDirectory(getDataFolder())
                 .copyDefaults(true)
                 .build();
-        loadConfiguration();
+        this.loadConfiguration();
+
+        config = new YamlMessageConfig(
+                loadConfiguration(ConfigLoader.builder("language_en.yml")
+                .parentDirectory(getDataFolder())
+                .copyDefaults(true)
+                .build())
+        );
     }
 
     @Override
@@ -118,5 +135,11 @@ public final class Cardinal extends MineAbyssPlugin implements CardinalAPI {
     @Override
     public PunishmentManager getPunishmentManager() {
         return punishmentManager;
+    }
+
+    @NotNull
+    @Override
+    public MessageConfig getMessagesConfig() {
+        return config;
     }
 }

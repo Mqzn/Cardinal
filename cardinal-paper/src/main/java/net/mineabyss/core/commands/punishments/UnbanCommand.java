@@ -1,26 +1,35 @@
 package net.mineabyss.core.commands.punishments;
 
 import com.mineabyss.lib.commands.annotations.Command;
+import com.mineabyss.lib.commands.annotations.Dependency;
 import com.mineabyss.lib.commands.annotations.Description;
 import com.mineabyss.lib.commands.annotations.Greedy;
 import com.mineabyss.lib.commands.annotations.Named;
 import com.mineabyss.lib.commands.annotations.Optional;
 import com.mineabyss.lib.commands.annotations.Permission;
 import com.mineabyss.lib.commands.annotations.Usage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.mineabyss.cardinal.api.config.MessageConfig;
+import net.mineabyss.cardinal.api.punishments.Punishable;
 import net.mineabyss.cardinal.api.punishments.Punishment;
 import net.mineabyss.cardinal.api.punishments.PunishmentIssuer;
 import net.mineabyss.cardinal.api.punishments.StandardPunishmentType;
+import net.mineabyss.cardinal.api.util.FutureOperation;
 import net.mineabyss.core.Cardinal;
 import net.mineabyss.core.CardinalPermissions;
+import net.mineabyss.core.commands.api.AllowsPunishmentID;
 import net.mineabyss.core.commands.api.CardinalSource;
-import org.bukkit.OfflinePlayer;
-import java.util.UUID;
+import net.mineabyss.core.config.MessageKeys;
+
 import java.util.concurrent.CompletableFuture;
 
 @Command("unban")
 @Permission(CardinalPermissions.UNBAN_COMMAND_PERMISSION)
 @Description("Unbans a player from the server.")
 public class UnbanCommand {
+
+    @Dependency
+    private MessageConfig config;
 
     @Usage
     public void def(CardinalSource source) {
@@ -31,17 +40,10 @@ public class UnbanCommand {
     @Usage
     public void exec(
             PunishmentIssuer issuer,
-            @Named("user")OfflinePlayer user,
+            @Named("user") @AllowsPunishmentID Punishable<?> target,
             @Optional @Greedy @Named("reason") String reason) {
 
-        if(user.getName() == null) {
-            issuer.sendMsg("<red>User doesn't exist !");
-            return;
-        }
-
-        UUID userUUID = user.getUniqueId();
-        Cardinal.getInstance().getPunishmentManager()
-                .getActivePunishment(userUUID, StandardPunishmentType.BAN)
+        target.fetchPunishment(StandardPunishmentType.BAN)
                 .thenCompose((punishmentContainer)-> {
 
                     if(punishmentContainer.isEmpty()) {
@@ -55,13 +57,13 @@ public class UnbanCommand {
 
                 })
                 .onSuccess((revoked)-> {
-
                     if(revoked) {
                         //send success to user
-                        issuer.sendMsg("<gray>Unbanned player <green>" + user.getName());
+                        issuer.sendMsg(config.getMessage(MessageKeys.Punishments.Unban.NOT_BANNED, Placeholder.unparsed("target", target.getTargetName())));
+                        //issuer.sendMsg("<gray>Unbanned player <green>" + user.getName());
                     }
                     else {
-                        issuer.sendMsg("<dark_red>ERROR: <red>Player '" + user.getName() + "' is not banned !");
+                        issuer.sendMsg(config.getMessage(MessageKeys.Punishments.Unban.SUCCESS, Placeholder.unparsed("target", target.getTargetName())));
                     }
                 });
 

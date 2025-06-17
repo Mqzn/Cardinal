@@ -1,5 +1,8 @@
 package net.mineabyss.core.punishments.core;
 
+import com.mineabyss.lib.util.TimeUtil;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.mineabyss.cardinal.api.punishments.Punishable;
 import net.mineabyss.cardinal.api.punishments.Punishment;
 import net.mineabyss.cardinal.api.punishments.PunishmentID;
@@ -334,6 +337,22 @@ public final class StandardPunishment<T> implements Punishment<T> {
     public void setDuration(Duration duration) {
         this.duration = duration;
         this.expiresAt = issuedAt.plus(this.duration);
+    }
+
+    @NotNull
+    @Override
+    public TagResolver asTagResolver() {
+        Duration remaining = Duration.between(Instant.now(), expiresAt);
+        return TagResolver.builder()
+                .tag("punishment_target", Tag.preProcessParsed(target.getTargetName()))
+                .tag("punishment_issuer", Tag.preProcessParsed(issuer.getName()))
+                .tag("punishment_reason", Tag.preProcessParsed(getReason().orElse("N/A")))
+                .tag("punishment_id", Tag.preProcessParsed(id.getRepresentation()))
+                .tag("punishment_issued_date", Tag.preProcessParsed(TimeUtil.formatDate(this.issuedAt)))
+                .tag("punishment_expires_date", Tag.preProcessParsed(TimeUtil.formatDate(this.expiresAt)))
+                .tag("punishment_duration", Tag.preProcessParsed( this.isPermanent() ? "∞" : TimeUtil.format(this.duration)) )
+                .tag("punishment_time_left", Tag.preProcessParsed(this.isPermanent() ? "∞" : TimeUtil.format(remaining)))
+                .build();
     }
 
     /**

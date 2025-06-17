@@ -1,20 +1,23 @@
 package net.mineabyss.core.commands.punishments;
 
 import com.mineabyss.lib.commands.annotations.Command;
+import com.mineabyss.lib.commands.annotations.Dependency;
 import com.mineabyss.lib.commands.annotations.Description;
 import com.mineabyss.lib.commands.annotations.Greedy;
 import com.mineabyss.lib.commands.annotations.Named;
 import com.mineabyss.lib.commands.annotations.Optional;
 import com.mineabyss.lib.commands.annotations.Permission;
 import com.mineabyss.lib.commands.annotations.Usage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.mineabyss.cardinal.api.config.MessageConfig;
 import net.mineabyss.cardinal.api.punishments.Punishment;
 import net.mineabyss.cardinal.api.punishments.PunishmentIssuer;
 import net.mineabyss.cardinal.api.punishments.StandardPunishmentType;
 import net.mineabyss.core.Cardinal;
 import net.mineabyss.core.CardinalPermissions;
 import net.mineabyss.core.commands.api.CardinalSource;
+import net.mineabyss.core.config.MessageKeys;
 import org.bukkit.OfflinePlayer;
-
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -22,6 +25,9 @@ import java.util.concurrent.CompletableFuture;
 @Permission(CardinalPermissions.UNMUTE_COMMAND_PERMISSION)
 @Description("Unmutes a player on the server.")
 public final class UnMuteCommand {
+
+    @Dependency
+    private MessageConfig config;
 
     @Usage
     public void def(CardinalSource source) {
@@ -59,10 +65,11 @@ public final class UnMuteCommand {
 
                     if(revoked) {
                         //send success to user
-                        issuer.sendMsg("<gray>Unmuted player <green>" + user.getName());
+                        issuer.sendMsg(config.getMessage(MessageKeys.Punishments.Unmute.NOT_MUTED, Placeholder.unparsed("target", user.getName()),
+                                Placeholder.unparsed("reason", reason)));
                     }
                     else {
-                        issuer.sendMsg("<dark_red>ERROR: <red>Player '" + user.getName() + "' is not muted !");
+                        issuer.sendMsg(config.getMessage(MessageKeys.Punishments.Unmute.SUCCESS, Placeholder.unparsed("target", user.getName()), Placeholder.unparsed("reason", reason)));
                     }
                 });
 

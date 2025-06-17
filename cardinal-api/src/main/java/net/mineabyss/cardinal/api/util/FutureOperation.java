@@ -223,6 +223,13 @@ public final class FutureOperation<T> {
     }
 
     /**
+     * Apply a function to the result and return a new FutureWrapper
+     */
+    public <U> FutureOperation<U> thenApplyAsync(Function<T, U> function) {
+        return FutureOperation.of(future.thenApplyAsync(function));
+    }
+
+    /**
      * Compose with another CompletableFuture-returning function
      */
     public <U> FutureOperation<U> thenCompose(Function<T, CompletableFuture<U>> function) {

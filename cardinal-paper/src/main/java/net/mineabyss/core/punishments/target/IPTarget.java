@@ -1,22 +1,33 @@
 package net.mineabyss.core.punishments.target;
 
+import net.kyori.adventure.text.Component;
+import net.mineabyss.cardinal.api.CardinalProvider;
 import net.mineabyss.cardinal.api.punishments.Punishable;
 import net.mineabyss.cardinal.api.punishments.PunishableType;
+import net.mineabyss.cardinal.api.punishments.Punishment;
+import net.mineabyss.cardinal.api.punishments.PunishmentType;
+import net.mineabyss.cardinal.api.util.FutureOperation;
+import net.mineabyss.core.util.IPUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 final class IPTarget implements Punishable<String> {
 
     private final @Nullable PlayerTarget target;
+    private final UUID uuid;
     private final String ipAddress;
     private Instant lastSeen;
 
     IPTarget(@Nullable PlayerTarget target, String ipAddress) {
         this.target = target;
+        this.uuid = IPUtils.ipToUUID(ipAddress);
         this.ipAddress = ipAddress;
     }
 
@@ -51,7 +62,7 @@ final class IPTarget implements Punishable<String> {
      */
     @Override
     public @NotNull UUID getTargetUUID() {
-        return UUID.nameUUIDFromBytes(ipAddress.getBytes(StandardCharsets.UTF_8));
+        return uuid;
     }
 
     /**
@@ -80,6 +91,49 @@ final class IPTarget implements Punishable<String> {
     @Override
     public void refreshLastSeen() {
         lastSeen = Instant.now(); // Update last seen for the IP if target is null
+    }
+
+    @Override
+    public void kick(Component component) {
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            if(Objects.requireNonNull(player.getAddress()).getAddress().getHostAddress().equals(ipAddress)) {
+                player.kick(component);
+            }
+        }
+    }
+
+    @Override
+    public void sendMsg(String msg) {
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            if(Objects.requireNonNull(player.getAddress()).getAddress().getHostAddress().equals(ipAddress)) {
+                player.sendRichMessage(msg);
+            }
+        }
+    }
+
+    @Override
+    public void sendMsg(Component component) {
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            if(Objects.requireNonNull(player.getAddress()).getAddress().getHostAddress().equals(ipAddress)) {
+                player.sendMessage(component);
+            }
+        }
+    }
+
+    @Override
+    public @Nullable OfflinePlayer asOfflinePlayer() {
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            if(Objects.requireNonNull(player.getAddress()).getAddress().getHostAddress().equals(ipAddress)) {
+                return player;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public FutureOperation<Optional<Punishment<?>>> fetchPunishment(PunishmentType punishmentType) {
+        return CardinalProvider.provide().getPunishmentManager()
+                .getActiveIPPunishment(this.ipAddress, punishmentType);
     }
 
 }

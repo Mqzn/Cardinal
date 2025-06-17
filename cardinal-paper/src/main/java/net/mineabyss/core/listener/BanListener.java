@@ -26,6 +26,7 @@ public class BanListener implements Listener {
             Optional<Punishment<?>> activeBan = getActiveBanPunishment(uuid);
 
             if (activeBan.isEmpty()) {
+                Cardinal.log("No active ban punishments!");
                 return; // No active ban, allow login
             }
 
@@ -81,6 +82,7 @@ public class BanListener implements Listener {
     private LoginResult processBanPunishment(Punishment<?> punishment, UUID uuid, String playerName) {
         try {
             // Handle permanent bans
+            System.out.println("Punishment");
             if (punishment.isPermanent()) {
                 return LoginResult.deny(PunishmentMessageUtil.getBanKickMessage(punishment));
             }

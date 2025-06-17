@@ -1,5 +1,6 @@
 package net.mineabyss.core.punishments.issuer;
 
+import net.kyori.adventure.text.Component;
 import net.mineabyss.cardinal.api.punishments.IssuerType;
 import net.mineabyss.cardinal.api.punishments.PunishmentIssuer;
 import org.bukkit.Bukkit;
@@ -65,5 +66,10 @@ public final class ConsoleIssuer implements PunishmentIssuer {
     @Override
     public void sendMsg(String msg) {
         Bukkit.getConsoleSender().sendRichMessage(msg);
+    }
+
+    @Override
+    public void sendMsg(Component component) {
+        Bukkit.getConsoleSender().sendMessage(component);
     }
 }

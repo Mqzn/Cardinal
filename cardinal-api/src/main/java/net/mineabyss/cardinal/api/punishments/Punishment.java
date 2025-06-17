@@ -1,5 +1,6 @@
 package net.mineabyss.cardinal.api.punishments;
 
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.mineabyss.cardinal.api.storage.DBEntity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +18,8 @@ import java.util.Optional;
  */
 public interface Punishment<T> extends DBEntity<String> {
 
-    default @NotNull @Override String getEntityID() {
+    @NotNull @Override
+    default String getEntityID() {
         return getId().getRepresentation();
     }
 
@@ -179,6 +181,7 @@ public interface Punishment<T> extends DBEntity<String> {
     void setDuration(Duration duration);
 
     default boolean hasExpired() {
+        if(this.isPermanent()) return false;
         Instant expiresAt = this.getExpiresAt();
         return !expiresAt.isAfter(Instant.now());
     }
@@ -204,4 +207,7 @@ public interface Punishment<T> extends DBEntity<String> {
          */
         @NotNull String getReason();
     }
+
+    @NotNull TagResolver asTagResolver();
+
 }

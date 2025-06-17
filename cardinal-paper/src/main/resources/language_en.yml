@@ -1,0 +1,113 @@
+primary_color: "<gray>"
+secondary_color: "<red>"
+prefix: "<gradient:#c61313:#400040>Cardinal</gradient> <dark_gray>»"
+
+punishments:
+  ban:
+    already_banned: "<prefix> <dark_red>ERROR:</dark_red> <pc>User <sc><target> <pc>is already banned!"
+    kick_message_permanent: |
+      <gradient:#ff4444:#cc0000><bold>⚠ PERMANENT BAN NOTICE ⚠</bold></gradient>
+      <dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</dark_gray>
+      <sc><bold>You are permanently banned from this server</bold></sc>
+      <pc>📋 </pc><white>Case ID:</white> <yellow>#<punishment_id></yellow>
+      <pc>📝 </pc><white>Reason:</white> <#ffa500><punishment_reason></#ffa500>
+      <pc>📅 </pc><white>Issued:</white> <aqua><punishment_issued_date></aqua>
+      <pc>⏱ </pc><gradient:#ff6b6b:#cc0000>This ban has no expiration date</gradient>
+      <dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</dark_gray>
+      <pc><italic>Appeal at: example.com/appeals</italic></pc>
+
+    kick_message_temporary: |
+      <gradient:#ff4444:#cc0000><bold>⚠ TEMPORARY BAN NOTICE ⚠</bold></gradient>
+      <dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</dark_gray>
+      <sc><bold>Your access has been temporarily suspended</bold></sc>
+      <pc>📋 </pc><white>Case ID:</white> <yellow>#<punishment_id></yellow>
+      <pc>📝 </pc><white>Reason:</white> <#ffa500><punishment_reason></#ffa500>
+      <pc>📅 </pc><white>Issued:</white> <aqua><punishment_issued_date></aqua>
+      <pc>⏳ </pc><white>Expires:</white> <green><punishment_expires_date></green>
+      <dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</dark_gray>
+      <pc><italic>Automatic restoration at expiration</italic></pc>
+
+    broadcast: "<prefix> <sc>⚡ <bold><punishment_target></bold> <pc>received permanent ban » <yellow><punishment_reason></yellow> <pc>| By: <aqua><punishment_issuer></aqua>"
+    broadcast_silent: "<prefix> <dark_gray>[<pc>SILENT<dark_gray>]</pc> <sc>⚡ <bold><punishment_target></bold> <pc>permanently banned » <yellow><punishment_reason></yellow>"
+    broadcast_temporary: "<prefix> <sc>⚡ <bold><punishment_target></bold> <pc>temporarily banned » <yellow><punishment_reason></yellow> <pc>(<gold><punishment_duration></gold>) | By: <aqua><punishment_issuer></aqua>"
+    broadcast_temporary_silent: "<prefix> <dark_gray>[<pc>SILENT<dark_gray>]</pc> <sc>⚡ <bold><punishment_target></bold> <pc>temp banned » <yellow><punishment_reason></yellow> <pc>(<gold><punishment_duration></gold>)"
+    success: "<prefix> <green>✔ Permanent ban applied to <yellow><punishment_target></yellow> | Reason: <#ffa500><punishment_reason></#ffa500>"
+    success_temporary: "<prefix> <green>✔ Temporary ban applied to <yellow><punishment_target></yellow> | Duration: <gold><punishment_duration></gold> | Reason: <#ffa500><punishment_reason></#ffa500>"
+
+  kick:
+    message: |
+      <gradient:#ffaa00:#ff5555><bold>⚠ PLAYER KICK NOTICE ⚠</bold></gradient>
+      <dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</dark_gray>
+      <sc><bold>You were removed from the server</bold></sc>
+      <pc>📝 </pc><white>Reason:</white> <#ffa500><punishment_reason></#ffa500>
+      <pc>🛡 </pc><white>Moderator:</white> <yellow><punishment_issuer></yellow>
+      <pc>📅 </pc><white>Issued:</white> <aqua><punishment_issued_date></aqua>
+      <dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</dark_gray>
+      <pc><italic>You may reconnect immediately</italic></pc>
+
+    broadcast: "<prefix> <sc>⚡ <bold><punishment_target></bold> <pc>was kicked » <yellow><punishment_reason></yellow> <pc>| By: <aqua><punishment_issuer></aqua>"
+    broadcast_silent: "<prefix> <dark_gray>[<pc>SILENT<dark_gray>]</pc> <sc>⚡ <bold><punishment_target></bold> <pc>kicked » <yellow><punishment_reason></yellow>"
+    success: "<prefix> <green>✔️ Kicked <yellow><punishment_target></yellow> | Reason: <#ffa500><punishment_reason></#ffa500>"
+
+  mute:
+    notification_permanent: |
+      <gradient:#ffaa00:#ff6600><bold>🔇 PERMANENT MUTE NOTICE 🔇</bold></gradient>
+      <dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</dark_gray>
+      <sc><bold>Your chat privileges have been revoked</bold></sc>
+      <pc>📋 </pc><white>Case ID:</white> <yellow>#<punishment_id></yellow>
+      <pc>📝 </pc><white>Reason:</white> <#ffa500><punishment_reason></#ffa500>
+      <pc>📅 </pc><white>Issued:</white> <aqua><punishment_issued_date></aqua>
+      <pc>⏱ </pc><gradient:#ff9900:#cc6600>This restriction has no expiration</gradient>
+      <dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</dark_gray>
+      <pc><italic>Appeal at: example.com/appeals</italic></pc>
+
+    notification_temporary: |
+      <gradient:#ffaa00:#ff6600><bold>🔇 TEMPORARY MUTE NOTICE 🔇</bold></gradient>
+      <dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</dark_gray>
+      <sc><bold>Your chat privileges are temporarily suspended</bold></sc>
+      <pc>📋 </pc><white>Case ID:</white> <yellow>#<punishment_id></yellow>
+      <pc>📝 </pc><white>Reason:</white> <#ffa500><punishment_reason></#ffa500>
+      <pc>📅 </pc><white>Issued:</white> <aqua><punishment_issued_date></aqua>
+      <pc>⏳ </pc><white>Restores:</white> <green><punishment_expires_date></green>
+      <pc>⏱ </pc><white>Time remaining:</white> <yellow><punishment_time_remaining></yellow>
+      <dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</dark_gray>
+      <pc><italic>Automatically lifted at expiration</italic></pc>
+
+    chat_blocked_temporary: "<prefix> <sc>🔇 <bold>You are muted!</bold> <pc>Time remaining: <yellow><punishment_time_left></yellow>"
+    chat_blocked_permanent: "<prefix> <sc>🔇 <bold>You are permanently muted!</bold> <pc>Appeal at: example.com/appeals"
+    broadcast: "<prefix> <sc>⚡ <bold><punishment_target></bold> <pc>was muted » <yellow><punishment_reason></yellow> <pc>| By: <aqua><punishment_issuer></aqua>"
+    broadcast_silent: "<prefix> <dark_gray>[<pc>SILENT<dark_gray>]</pc> <sc>⚡ <bold><punishment_target></bold> <pc>muted » <yellow><punishment_reason></yellow>"
+    broadcast_temporary: "<prefix> <sc>⚡ <bold><punishment_target></bold> <pc>temporarily muted » <yellow><punishment_reason></yellow> <pc>(<gold><punishment_duration></gold>) | By: <aqua><punishment_issuer></aqua>"
+    broadcast_temporary_silent: "<prefix> <dark_gray>[<pc>SILENT<dark_gray>]</pc> <sc>⚡ <bold><punishment_target></bold> <pc>temp muted » <yellow><punishment_reason></yellow> <pc>(<gold><punishment_duration></gold>)"
+    success: "<prefix> <green>✔️ Permanent mute applied to <yellow><punishment_target></yellow> | Reason: <#ffa500><punishment_reason></#ffa500>"
+    success_temporary: "<prefix> <green>✔️ Temporary mute applied to <yellow><punishment_target></yellow> | Duration: <gold><punishment_duration></gold> | Reason: <#ffa500><punishment_reason></#ffa500>"
+
+  warn:
+    notification: |
+      <gradient:#ffff00:#ff8800><bold>⚠ OFFICIAL WARNING ⚠</bold></gradient>
+      <dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</dark_gray>
+      <sc><bold>You have received an administrative warning</bold></sc>
+      <pc>📋 </pc><white>Warning ID:</white> <yellow>#<punishment_id></yellow>
+      <pc>📝 </pc><white>Reason:</white> <#ffa500><punishment_reason></#ffa500>
+      <pc>📅 </pc><white>Issued:</white> <aqua><punishment_issued_date></aqua>
+      <pc>🛡 </pc><white>Moderator:</white> <yellow><punishment_issuer></yellow>
+      <dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</dark_gray>
+      <pc><italic>Further violations may lead to sanctions</italic></pc>
+
+    broadcast: "<prefix> <sc>⚡ <bold><punishment_target></bold> <pc>was warned » <yellow><punishment_reason></yellow> <pc>| By: <aqua><punishment_issuer></aqua>"
+    broadcast_silent: "<prefix> <dark_gray>[<pc>SILENT<dark_gray>]</pc> <sc>⚡ <bold><punishment_target></bold> <pc>warned » <yellow><punishment_reason></yellow>"
+    success: "<prefix> <green>✔ Warning issued to <yellow><punishment_target></yellow> | Reason: <#ffa500><punishment_reason></#ffa500>"
+
+  unban:
+    not_banned: "<prefix> <dark_red>ERROR: <red>Player '<target>' is not banned or doesn't exist!"
+    success: "<prefix> <gray>Unbanned player <green> '<target>'"
+  unmute:
+    not_muted: "<prefix> <dark_red>ERROR: <red>Player '<target>' is not muted or doesn't exist!"
+    success: "<prefix> <gray>Unmuted player <green> '<target>'"
+
+  commands:
+    no_permission: "<red>❌ You don't have permission to use this command!"
+    invalid_usage: "<red>❌ Invalid usage! Correct usage: <usage>"
+    player_not_found: "<red>❌ Player '<punishment_target>' is not online or doesn't exist!"
+    console_only: "<red>❌ This command can only be executed from the console!"
+    player_only: "<red>❌ This command can only be executed by players!"

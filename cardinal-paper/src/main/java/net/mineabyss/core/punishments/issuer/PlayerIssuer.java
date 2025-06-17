@@ -1,5 +1,6 @@
 package net.mineabyss.core.punishments.issuer;
 
+import net.kyori.adventure.text.Component;
 import net.mineabyss.cardinal.api.punishments.IssuerType;
 import net.mineabyss.cardinal.api.punishments.PunishmentIssuer;
 import org.bukkit.Bukkit;
@@ -70,6 +71,14 @@ public final class PlayerIssuer implements PunishmentIssuer {
         Player player = Bukkit.getPlayer(uniqueId);
         if(player != null) {
             player.sendRichMessage(msg);
+        }
+    }
+
+    @Override
+    public void sendMsg(Component component) {
+        Player player = Bukkit.getPlayer(uniqueId);
+        if(player != null) {
+            player.sendMessage(component);
         }
     }
 

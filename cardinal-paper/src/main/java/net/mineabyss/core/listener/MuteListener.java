@@ -22,7 +22,7 @@ public class MuteListener implements Listener {
 
         if(punishmentContainer.isPresent()) {
             Punishment<?> punishment = punishmentContainer.get();
-            player.sendRichMessage(PunishmentMessageUtil.getMuteMessageMiniMessage(punishment));
+            player.sendMessage(PunishmentMessageUtil.getMuteChatBlock(punishment));
             event.setCancelled(true);
         }
 

@@ -1,8 +1,12 @@
 package net.mineabyss.cardinal.api.punishments;
 
+import net.kyori.adventure.text.Component;
+import net.mineabyss.cardinal.api.util.FutureOperation;
+import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -52,4 +56,14 @@ public interface Punishable<T> {
      * Sets last seen time of the target entity to the current time.
      */
     void refreshLastSeen();
+
+    void kick(Component component);
+
+    void sendMsg(String msg);
+
+    void sendMsg(Component component);
+
+    OfflinePlayer asOfflinePlayer();
+
+    FutureOperation<Optional<Punishment<?>>> fetchPunishment(PunishmentType punishmentType);
 }

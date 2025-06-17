@@ -1,10 +1,19 @@
 package net.mineabyss.core.punishments.target;
 
+import net.kyori.adventure.text.Component;
+import net.mineabyss.cardinal.api.CardinalProvider;
 import net.mineabyss.cardinal.api.punishments.Punishable;
 import net.mineabyss.cardinal.api.punishments.PunishableType;
+import net.mineabyss.cardinal.api.punishments.Punishment;
+import net.mineabyss.cardinal.api.punishments.PunishmentType;
+import net.mineabyss.cardinal.api.util.FutureOperation;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
 import java.time.Instant;
+import java.util.Calendar;
+import java.util.Optional;
 import java.util.UUID;
 
 final class PlayerTarget implements Punishable<UUID> {
@@ -85,5 +94,40 @@ final class PlayerTarget implements Punishable<UUID> {
     @Override
     public void refreshLastSeen() {
         this.lastSeen = Instant.now();
+    }
+
+    @Override
+    public void kick(Component component) {
+        Player player = Bukkit.getPlayer(playerUUID);
+        if(player != null) {
+            player.kick(component);
+        }
+    }
+
+    @Override
+    public void sendMsg(String msg) {
+        Player player = Bukkit.getPlayer(playerUUID);
+        if(player != null) {
+            player.sendRichMessage(msg);
+        }
+    }
+
+    @Override
+    public void sendMsg(Component component) {
+        Player player = Bukkit.getPlayer(playerUUID);
+        if(player != null) {
+            player.sendMessage(component);
+        }
+    }
+
+    @NotNull @Override
+    public OfflinePlayer asOfflinePlayer() {
+        return Bukkit.getOfflinePlayer(playerUUID);
+    }
+
+    @Override
+    public FutureOperation<Optional<Punishment<?>>> fetchPunishment(PunishmentType punishmentType) {
+        return CardinalProvider.provide().getPunishmentManager()
+                .getActivePunishment(this.playerUUID, punishmentType);
     }
 }

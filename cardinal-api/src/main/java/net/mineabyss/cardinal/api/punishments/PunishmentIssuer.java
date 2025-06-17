@@ -1,5 +1,6 @@
 package net.mineabyss.cardinal.api.punishments;
 
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -53,4 +54,6 @@ public interface PunishmentIssuer {
     }
 
     void sendMsg(String msg);
+
+    void sendMsg(Component component);
 }

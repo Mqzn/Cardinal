@@ -1,6 +1,7 @@
 package net.mineabyss.core.punishments.target;
 
 import net.mineabyss.cardinal.api.punishments.Punishable;
+import net.mineabyss.cardinal.api.punishments.PunishmentID;
 import org.bukkit.OfflinePlayer;
 
 import java.util.UUID;
@@ -23,4 +24,7 @@ public final class PunishmentTargetFactory {
         return new IPTarget(null, ipAddress);
     }
 
+    public static Punishable<PunishmentID> punishmentID(String punishmentIDRepresentation) {
+        return new PunishmentIDTarget(punishmentIDRepresentation);
+    }
 }

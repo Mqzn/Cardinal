@@ -6,6 +6,13 @@ package net.mineabyss.cardinal.api.punishments;
  * such as a player's account or an IP address.
  */
 public enum PunishableType {
-    PLAYER,
-    IP_ADDRESS;
+    PLAYER(),
+
+    IP_ADDRESS(),
+
+    PUNISHMENT_ID();
+
+
+    PunishableType() {
+    }
 }
