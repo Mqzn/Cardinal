@@ -1,4 +1,4 @@
-package net.mineabyss.core.commands.punishments.templates;
+package net.mineabyss.core.punishments.templates;
 
 import lombok.Getter;
 import net.mineabyss.cardinal.api.CardinalProvider;
@@ -12,6 +12,8 @@ import net.mineabyss.cardinal.api.punishments.templates.TemplateExecutionResult;
 import net.mineabyss.cardinal.api.punishments.templates.TemplateExecutor;
 import net.mineabyss.cardinal.api.punishments.templates.TemplateId;
 import net.mineabyss.cardinal.api.punishments.templates.ValidationResult;
+import net.mineabyss.cardinal.api.util.FutureOperation;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -81,20 +83,20 @@ public final class PunishmentTemplateGroup implements PunishmentTemplate {
     }
     
     @Override
-    public CompletableFuture<TemplateExecutionResult> execute(PunishmentContext context, TemplateExecutor executor) {
+    public FutureOperation<TemplateExecutionResult> execute(PunishmentContext context, TemplateExecutor executor) {
         return calculateLadderPosition(context.punishable())
             .thenCompose(position -> {
                 var ladderStep = getLadderStepForPosition(position);
                 // Execute individual template based on weights
                 // Execute group ladder step
                 return ladderStep.map(step -> executeGroupLadderStep(context, executor, step))
-                        .orElseGet(() -> executeIndividualTemplate(context, executor));
+                        .orElseGet(() -> executeIndividualTemplate(context, executor).unwrap());
             })
-            .exceptionally(ex -> new TemplateExecutionResult.GroupPunishmentResult(List.of(),
+            .onErrorAndReturn(ex -> new TemplateExecutionResult.GroupPunishmentResult(List.of(),
                     List.of("Failed to execute group: " + ex.getMessage())));
     }
     
-    private CompletableFuture<TemplateExecutionResult> executeIndividualTemplate(PunishmentContext context, TemplateExecutor executor) {
+    private FutureOperation<TemplateExecutionResult> executeIndividualTemplate(PunishmentContext context, TemplateExecutor executor) {
         // For now, execute the first available template
         // In a real implementation, you might want more sophisticated selection logic
         var firstTemplate = childTemplates.values().iterator().next();
@@ -108,25 +110,29 @@ public final class PunishmentTemplateGroup implements PunishmentTemplate {
     }
     
     @Override
-    public CompletableFuture<Double> calculateLadderPosition(Punishable<?> playerId) {
+    public FutureOperation<Double> calculateLadderPosition(Punishable<?> playerId) {
         var futures = weights.entrySet().stream()
             .collect(HashMap<TemplateId, CompletableFuture<Integer>>::new,
-                    (map, entry) -> map.put(entry.getKey(), 
-                        CardinalProvider.provide().getPunishmentManager().getRecentPunishments(Duration.ofDays(3), -1).unwrap()
-                                     .thenApply(Deque::size)),
+                    (map, entry) ->
+                            map.put(entry.getKey(),
+                            CardinalProvider.provide().getPunishmentManager()
+                                .getHistoryService().getRecentPunishments(Duration.ofDays(3), -1).unwrap()
+                                    .thenApply(Deque::size)),
                     HashMap::putAll);
         
-        return CompletableFuture.allOf(futures.values().toArray(new CompletableFuture[0]))
-            .thenApply(v -> {
-                double sum = futures.entrySet().stream()
-                    .mapToDouble(entry -> entry.getValue().join() * weights.get(entry.getKey()))
-                    .sum();
-                return sum + 1.0; // Add 1 as per specification
-            });
+        return FutureOperation.of(
+                CompletableFuture.allOf(futures.values().toArray(new CompletableFuture[0]))
+                .thenApply(v -> {
+                    double sum = futures.entrySet().stream()
+                        .mapToDouble(entry -> entry.getValue().join() * weights.get(entry.getKey()))
+                        .sum();
+                    return sum + 1.0; // Add 1 as per specification
+                })
+        );
     }
     
     @Override
-    public CompletableFuture<Optional<LadderStep>> getEffectiveLadderStep(Punishable<?> target) {
+    public FutureOperation<Optional<LadderStep>> getEffectiveLadderStep(Punishable<?> target) {
         return calculateLadderPosition(target)
             .thenApply(this::getLadderStepForPosition);
     }
@@ -170,6 +176,11 @@ public final class PunishmentTemplateGroup implements PunishmentTemplate {
     @Override
     public List<PunishmentTemplate> getChildTemplates() {
         return List.copyOf(childTemplates.values());
+    }
+
+    @Override
+    public boolean isGroup() {
+        return true;
     }
 
     public Map<String, LadderStep> getLadder() { return Map.copyOf(ladder); }

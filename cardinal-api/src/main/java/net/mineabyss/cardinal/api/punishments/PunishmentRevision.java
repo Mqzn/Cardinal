@@ -1,9 +1,9 @@
 package net.mineabyss.cardinal.api.punishments;
 
+import net.mineabyss.cardinal.api.punishments.templates.PunishmentHistoryService;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -17,7 +17,7 @@ import java.util.*;
  * </p>
  *
  * @since 1.0
- * @see PunishmentManager#getPunishmentRevisions(PunishmentID)
+ * @see PunishmentHistoryService#getPunishmentRevisions(PunishmentID)
  */
 public final class PunishmentRevision {
 

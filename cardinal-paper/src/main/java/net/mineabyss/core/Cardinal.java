@@ -5,6 +5,7 @@ import com.mineabyss.lib.Events;
 import com.mineabyss.lib.bootstrap.MineAbyssPlugin;
 import com.mineabyss.lib.commands.BukkitImperat;
 import com.mineabyss.lib.commands.util.TypeWrap;
+import com.mineabyss.lib.gui.Lotus;
 import lombok.Getter;
 import net.mineabyss.cardinal.api.CardinalAPI;
 import net.mineabyss.cardinal.api.CardinalProvider;
@@ -14,6 +15,7 @@ import net.mineabyss.cardinal.api.punishments.PunishmentIssuer;
 import net.mineabyss.cardinal.api.punishments.PunishmentManager;
 import net.mineabyss.cardinal.api.storage.StorageException;
 import net.mineabyss.core.commands.api.PunishableParameterType;
+import net.mineabyss.core.commands.punishments.HistoryCommand;
 import net.mineabyss.core.commands.punishments.KickCommand;
 import net.mineabyss.core.commands.punishments.UnMuteCommand;
 import net.mineabyss.core.commands.api.CardinalSource;
@@ -39,6 +41,8 @@ public final class Cardinal extends MineAbyssPlugin implements CardinalAPI {
 
     private MessageConfig config;
     private PunishmentManager punishmentManager;
+
+    @Getter private Lotus lotus;
 
     public Cardinal(
     ) {
@@ -73,7 +77,8 @@ public final class Cardinal extends MineAbyssPlugin implements CardinalAPI {
                 new UnbanCommand(),
                 new MuteCommand(),
                 new UnMuteCommand(),
-                new WarnCommand()
+                new WarnCommand(),
+                new HistoryCommand()
         );
     }
 
@@ -107,6 +112,7 @@ public final class Cardinal extends MineAbyssPlugin implements CardinalAPI {
     @Override
     protected void onStart() {
         //TODO start core
+        this.lotus = Lotus.load(this);
         try {
             punishmentManager = StandardPunishmentManager.createNew(this.configYaml);
         } catch (StorageException e) {
@@ -144,4 +150,5 @@ public final class Cardinal extends MineAbyssPlugin implements CardinalAPI {
     public MessageConfig getMessagesConfig() {
         return config;
     }
+
 }

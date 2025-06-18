@@ -1,8 +1,20 @@
-package net.mineabyss.cardinal.api.punishments.templates;
+package net.mineabyss.core.punishments.templates;
 
+import lombok.Getter;
 import net.mineabyss.cardinal.api.CardinalProvider;
 import net.mineabyss.cardinal.api.punishments.Punishable;
 import net.mineabyss.cardinal.api.punishments.PunishmentType;
+import net.mineabyss.cardinal.api.punishments.templates.LadderStep;
+import net.mineabyss.cardinal.api.punishments.templates.PermissionChecker;
+import net.mineabyss.cardinal.api.punishments.templates.PunishmentContext;
+import net.mineabyss.cardinal.api.punishments.templates.PunishmentTemplate;
+import net.mineabyss.cardinal.api.punishments.templates.TemplateAction;
+import net.mineabyss.cardinal.api.punishments.templates.TemplateExecutionResult;
+import net.mineabyss.cardinal.api.punishments.templates.TemplateExecutor;
+import net.mineabyss.cardinal.api.punishments.templates.TemplateId;
+import net.mineabyss.cardinal.api.punishments.templates.ValidationResult;
+import net.mineabyss.cardinal.api.util.FutureOperation;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -11,20 +23,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 public final class SinglePunishmentTemplate implements PunishmentTemplate {
     
     private final TemplateId id;
     private final PunishmentType type;
-    private final String defaultReason;
-    private final String defaultMessage;
+    // Getters for builder pattern
+    @Getter private final String defaultReason;
+    @Getter private final String defaultMessage;
     private final Duration defaultDuration;
     private final String requiredPermission;
-    private final List<TemplateAction> defaultActions;
-    private final List<String> defaultFlags;
+    @Getter private final List<TemplateAction> defaultActions;
+    @Getter private final List<String> defaultFlags;
     private final LinkedHashMap<String, LadderStep> ladder;
-    private final Duration expireLadder;
+    @Getter private final Duration expireLadder;
     private final boolean ipTemplate;
     
     private SinglePunishmentTemplate(Builder builder) {
@@ -61,7 +73,7 @@ public final class SinglePunishmentTemplate implements PunishmentTemplate {
     }
 
     @Override
-    public CompletableFuture<TemplateExecutionResult> execute(PunishmentContext context, TemplateExecutor executor) {
+    public FutureOperation<TemplateExecutionResult> execute(PunishmentContext context, TemplateExecutor executor) {
         return getEffectiveLadderStep(context.punishable())
                 .thenCompose(ladderStep -> {
                     // Build the effective punishment configuration
@@ -78,10 +90,9 @@ public final class SinglePunishmentTemplate implements PunishmentTemplate {
                     var effectiveActions = new ArrayList<>(defaultActions);
                     ladderStep.ifPresent(step -> effectiveActions.addAll(step.actions()));
 
-            /*var effectiveFlags = new ArrayList<>(defaultFlags);
-            ladderStep.ifPresent(step -> effectiveFlags.addAll(step.flags()));
-            */
-
+                    /*  var effectiveFlags = new ArrayList<>(defaultFlags);
+                        ladderStep.ifPresent(step -> effectiveFlags.addAll(step.flags()));
+                    */
                     // Create punishment record
                     return executor.createPunishment(
                             context.punishable(),
@@ -102,7 +113,7 @@ public final class SinglePunishmentTemplate implements PunishmentTemplate {
     }
     
     @Override
-    public CompletableFuture<Double> calculateLadderPosition(Punishable<?> target) {
+    public FutureOperation<Double> calculateLadderPosition(Punishable<?> target) {
         return CardinalProvider.provide().getPunishmentManager().getHistoryService()
                 .getPunishmentHistory(target, id)
             .thenApply(history -> {
@@ -120,7 +131,7 @@ public final class SinglePunishmentTemplate implements PunishmentTemplate {
     }
     
     @Override
-    public CompletableFuture<Optional<LadderStep>> getEffectiveLadderStep(Punishable<?> target) {
+    public FutureOperation<Optional<LadderStep>> getEffectiveLadderStep(Punishable<?> target) {
         return calculateLadderPosition(target)
             .thenApply(position -> {
                 var steps = ladder.values().stream().toList();
@@ -158,17 +169,17 @@ public final class SinglePunishmentTemplate implements PunishmentTemplate {
     
     @Override
     public List<PunishmentTemplate> getChildTemplates() { return List.of(this); }
-    
-    // Getters for builder pattern
-    public String getDefaultReason() { return defaultReason; }
-    public String getDefaultMessage() { return defaultMessage; }
+
+    @Override
+    public boolean isGroup() {
+        return false;
+    }
+
     public Optional<Duration> getDefaultDuration() { return Optional.ofNullable(defaultDuration); }
     public Optional<String> getRequiredPermission() { return Optional.ofNullable(requiredPermission); }
-    public List<TemplateAction> getDefaultActions() { return defaultActions; }
-    public List<String> getDefaultFlags() { return defaultFlags; }
+
     public Map<String, LadderStep> getLadder() { return Map.copyOf(ladder); }
-    public Duration getExpireLadder() { return expireLadder; }
-    
+
     public static class Builder {
         private final TemplateId id;
         private final PunishmentType type;
