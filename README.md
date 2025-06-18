@@ -20,9 +20,11 @@ A comprehensive and easy-to-use punishment plugin for Minecraft servers, designe
 
   ✅ Kick Command: Kick a player from the server with an optional reason.
 
-  ⬜ Warning System: Issue warnings to players, with a clear history for each player.
+  ✅ Warning System: Issue warnings to players, with a clear history for each player.
 
   ⬜ Punishment History System: View a player's complete punishment history (mutes, bans, warnings).
+
+  ⬜ Template system with ladder configuration.
 
   ✅ Configurable Messages: Customize all punishment messages sent to players and staff.
 
