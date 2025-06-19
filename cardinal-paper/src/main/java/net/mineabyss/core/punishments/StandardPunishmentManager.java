@@ -13,7 +13,7 @@ import net.mineabyss.cardinal.api.punishments.PunishmentManager;
 import net.mineabyss.cardinal.api.punishments.PunishmentScanResult;
 import net.mineabyss.cardinal.api.punishments.PunishmentType;
 import net.mineabyss.cardinal.api.punishments.StandardPunishmentType;
-import net.mineabyss.cardinal.api.punishments.templates.PunishmentHistoryService;
+import net.mineabyss.cardinal.api.punishments.PunishmentHistoryService;
 import net.mineabyss.cardinal.api.storage.Repository;
 import net.mineabyss.cardinal.api.storage.StorageEngine;
 import net.mineabyss.cardinal.api.storage.StorageException;
@@ -398,57 +398,10 @@ public class StandardPunishmentManager implements PunishmentManager {
                 );
     }
 
-    /**
-     * Retrieves the complete punishment history for the specified player with a limit.
-     *
-     * <p>Returns the full punishment history (both active and inactive/expired punishments)
-     * for the player, limited to the specified number of records. The history is typically
-     * ordered chronologically with the most recent punishments first.</p>
-     *
-     * <p>The limit parameter controls how many punishment records are returned:
-     * <ul>
-     * <li>Positive values: Returns up to that many punishment records</li>
-     * <li>-1: Returns all punishment records with no limit</li>
-     * <li>0: Returns an empty deque</li>
-     * </ul></p>
-     *
-     * @param playerId the UUID of the player to query punishment history for
-     * @param limit    the maximum number of punishment records to return, or -1 for no limit
-     * @return a {@link FutureOperation} containing an {@link Optional} with a {@link Deque}
-     * of {@link Punishment} objects representing the player's history, or
-     * {@link Optional#empty()} if the player has no punishment history
-     * @throws IllegalArgumentException if playerId is null or limit is negative (except -1)
-     * @see #getFullHistory(UUID)
-     * @see #getActivePunishments(UUID)
-     */
     @Override
-    public FutureOperation<Deque<Punishment<?>>> getFullHistory(UUID playerId, int limit) {
-        return FutureOperation.of(CompletableFuture.supplyAsync(()-> {
-            Deque<Punishment<?>> fullHistory = new ArrayDeque<>();
-
-            for (var punishmentRepo : this.getPunishmentRepositories()) {
-                try {
-                    punishmentRepo.findAll().forEach(fullHistory::add);
-                } catch (StorageException e) {
-                    throw new RuntimeException(e);
-                }
-
-            }
-            if(limit == -1) {
-                return fullHistory;
-            }
-
-            Deque<Punishment<?>> trimmedHistory = new ArrayDeque<>();
-            for (int i = 0; i < limit; i++) {
-                Punishment<?> punishment = fullHistory.poll();
-                if(punishment == null || fullHistory.isEmpty()) break;
-                trimmedHistory.add(punishment);
-            }
-            return trimmedHistory;
-        }));
+    public Optional<Punishment<?>> getActivePunishmentByID(PunishmentID punishmentID) {
+        return Optional.ofNullable(activePunishmentsPerID.getIfPresent(punishmentID.getRepresentation()));
     }
-
-
 
 
     /**
@@ -717,8 +670,7 @@ public class StandardPunishmentManager implements PunishmentManager {
 
     @NotNull @Override
     public PunishmentHistoryService getHistoryService() {
-        //TODO make impl of history service using the manager with DI.
-        return null;
+        return historyService;
     }
 
 

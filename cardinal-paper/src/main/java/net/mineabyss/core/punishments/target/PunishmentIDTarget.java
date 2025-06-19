@@ -82,6 +82,7 @@ final class PunishmentIDTarget implements Punishable<PunishmentID> {
     @Override
     public FutureOperation<Optional<Punishment<?>>> fetchPunishment(PunishmentType punishmentType) {
         return CardinalProvider.provide().getPunishmentManager()
+                .getHistoryService()
                 .getPunishmentByID(this.punishmentID);
     }
 }

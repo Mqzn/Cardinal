@@ -1,6 +1,5 @@
 package net.mineabyss.cardinal.api.punishments;
 
-import net.mineabyss.cardinal.api.punishments.templates.PunishmentHistoryService;
 import net.mineabyss.cardinal.api.storage.Repository;
 import net.mineabyss.cardinal.api.storage.StorageEngine;
 import net.mineabyss.cardinal.api.util.FutureOperation;
@@ -29,13 +28,6 @@ import java.util.UUID;
  * @see PunishmentType
  */
 public interface PunishmentManager {
-
-    /**
-     * The default limit for punishment history fetching when no specific limit is provided.
-     *
-     * @see #getFullHistory(UUID)
-     */
-    int DEFAULT_HISTORY_FETCH_LIMIT = 100;
 
     /**
      * Retrieves the storage engine used by this component.
@@ -256,50 +248,13 @@ public interface PunishmentManager {
      */
     FutureOperation<Optional<Punishment<?>>> getLastActivePunishment(UUID playerId);
 
-    /**
-     * Retrieves the complete punishment history for the specified player with a limit.
-     *
-     * <p>Returns the full punishment history (both active and inactive/expired punishments)
-     * for the player, limited to the specified number of records. The history is typically
-     * ordered chronologically with the most recent punishments first.</p>
-     *
-     * <p>The limit parameter controls how many punishment records are returned:
-     * <ul>
-     * <li>Positive values: Returns up to that many punishment records</li>
-     * <li>-1: Returns all punishment records with no limit</li>
-     * <li>0: Returns an empty deque</li>
-     * </ul></p>
-     *
-     * @param playerId the UUID of the player to query punishment history for
-     * @param limit the maximum number of punishment records to return, or -1 for no limit
-     * @return a {@link FutureOperation} containing an {@link Optional} with a {@link Deque}
-     *         of {@link Punishment} objects representing the player's history, or
-     *         {@link Optional#empty()} if the player has no punishment history
-     * @throws IllegalArgumentException if playerId is null or limit is negative (except -1)
-     * @see #getFullHistory(UUID)
-     * @see #getActivePunishments(UUID)
-     */
-    FutureOperation<Deque<Punishment<?>>> getFullHistory(UUID playerId, int limit);
 
     /**
-     * Retrieves the complete punishment history for the specified player with the default limit.
-     *
-     * <p>This is a convenience method that calls {@link #getFullHistory(UUID, int)} with
-     * the {@link #DEFAULT_HISTORY_FETCH_LIMIT} value of 100 records.</p>
-     *
-     * @param playerId the UUID of the player to query punishment history for
-     * @return a {@link FutureOperation} containing an {@link Optional} with a {@link Deque}
-     *         of {@link Punishment} objects representing the player's history (limited to
-     *         {@value #DEFAULT_HISTORY_FETCH_LIMIT} records), or {@link Optional#empty()}
-     *         if the player has no punishment history
-     * @throws IllegalArgumentException if playerId is null
-     * @see #getFullHistory(UUID, int)
-     * @see #DEFAULT_HISTORY_FETCH_LIMIT
+     * Fetches active {@link Punishment} from its {@link PunishmentID}
+     * @param punishmentID the punishment id
+     * @return the {@link Optional} container containing active {@link Punishment}
      */
-    default FutureOperation<Deque<Punishment<?>>> getFullHistory(UUID playerId) {
-        return getFullHistory(playerId, DEFAULT_HISTORY_FETCH_LIMIT);
-    }
-
+    Optional<Punishment<?>> getActivePunishmentByID(PunishmentID punishmentID);
 
 
     /**

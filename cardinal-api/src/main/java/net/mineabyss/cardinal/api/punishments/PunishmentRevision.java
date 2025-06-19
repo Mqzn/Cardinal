@@ -1,6 +1,5 @@
 package net.mineabyss.cardinal.api.punishments;
 
-import net.mineabyss.cardinal.api.punishments.templates.PunishmentHistoryService;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
