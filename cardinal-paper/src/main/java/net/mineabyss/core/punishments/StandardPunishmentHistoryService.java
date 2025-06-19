@@ -116,7 +116,18 @@ final class StandardPunishmentHistoryService implements PunishmentHistoryService
                 }
 
             }
-            return fullHistory;
+
+            if(limit == -1) {
+                return fullHistory;
+            }
+
+            Deque<Punishment<?>> trimmedHistory = new ArrayDeque<>();
+            for (int i = 0; i < limit; i++) {
+                Punishment<?> punishment = fullHistory.poll();
+                if(punishment == null || fullHistory.isEmpty()) break;
+                trimmedHistory.add(punishment);
+            }
+            return trimmedHistory;
         }));
     }
 

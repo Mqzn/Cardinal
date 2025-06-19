@@ -115,7 +115,7 @@ public final class SinglePunishmentTemplate implements PunishmentTemplate {
     @Override
     public FutureOperation<Double> calculateLadderPosition(Punishable<?> target) {
         return CardinalProvider.provide().getPunishmentManager().getHistoryService()
-                .getPunishmentHistoryByTarget(target, id, )
+                .getPunishmentHistoryByTarget(target, id, 25)
             .thenApply(history -> {
                 if (expireLadder.isZero()) {
                     return (double) history.size();
