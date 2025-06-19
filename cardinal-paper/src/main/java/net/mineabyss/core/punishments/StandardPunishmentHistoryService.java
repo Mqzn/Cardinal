@@ -706,6 +706,7 @@ final class StandardPunishmentHistoryService implements PunishmentHistoryService
                     }
                 } catch (StorageException e) {
                     // Log error but continue processing other repositories
+                    e.printStackTrace();
                 }
             }
 
