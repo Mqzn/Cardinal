@@ -1,5 +1,6 @@
 package com.mineabyss.cardinal.punishments.gui;
 
+import com.mineabyss.cardinal.Cardinal;
 import com.mineabyss.lib.gui.base.pagination.PageComponent;
 import com.mineabyss.lib.gui.base.pagination.PageView;
 import com.mineabyss.lib.gui.misc.itembuilder.LegacyItemBuilder;
@@ -9,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +41,12 @@ public final class PunishmentPageComponent implements PageComponent {
 
         // Add reason if present
         if (punishment.getReason().isPresent()) {
-            lore.add("&7Reason: &f" + punishment.getReason().get());
+            var cfg = Cardinal.getInstance().getConfigYaml();
+            if(cfg == null) {
+                throw new IllegalStateException();
+            }
+            String defReason = Cardinal.getInstance().getConfigYaml().getString("default-reason");
+            lore.add("&7Reason: &f" + punishment.getReason().orElse(defReason));
             lore.add("");
         }
 
@@ -48,7 +55,13 @@ public final class PunishmentPageComponent implements PageComponent {
             lore.add("&7Duration: &cPermanent");
         } else {
             lore.add("&7Duration: &f" + TimeUtil.format(punishment.getDuration()));
-            lore.add("&7Expires: &f" + TimeUtil.formatDate(punishment.getExpiresAt()));
+
+            Instant expiresAt = punishment.getExpiresAt();
+            if(expiresAt == null) {
+                lore.add("&7Expires: &cNever");
+            } else {
+                lore.add("&7Expires: &f" + TimeUtil.formatDate(expiresAt));
+            }
         }
 
         lore.add("&7Issued: &f" + TimeUtil.formatDate(punishment.getIssuedAt()));
@@ -59,7 +72,8 @@ public final class PunishmentPageComponent implements PageComponent {
             lore.add("&7Status: &aRevoked");
             punishment.getRevocationInfo().ifPresent(info -> {
                 lore.add("&7Revoked by: &f" + info.getRevoker().getName());
-                lore.add("&7Revoke reason: &f" + info.getReason());
+                String revokeReason = info.getReason() == null ? "N/A" : info.getReason();
+                lore.add("&7Revoke reason: &f" + (info.getReason() == null ? "N/A" : info.getReason()));
             });
         } else if (punishment.hasExpired()) {
             lore.add("&7Status: &eExpired");

@@ -1,6 +1,7 @@
 package com.mineabyss.cardinal.commands.punishments;
 
 import com.mineabyss.cardinal.api.punishments.Punishable;
+import com.mineabyss.cardinal.commands.api.AllowsPunishmentID;
 import com.mineabyss.cardinal.util.Pair;
 import com.mineabyss.lib.commands.annotations.Command;
 import com.mineabyss.lib.commands.annotations.Dependency;
@@ -32,13 +33,13 @@ public final class UnMuteCommand {
 
     @Usage
     public void def(CardinalSource source) {
-        source.sendMsg("<red>Unmute <user> [reason...]");
+        source.sendMsg("<red>Unmute <target> [reason...]");
     }
 
     @Usage
     public void unmute(
             PunishmentIssuer issuer,
-            @Named("user")CompletableFuture<Punishable<?>> targetFuture,
+            @Named("target") @AllowsPunishmentID CompletableFuture<Punishable<?>> targetFuture,
             @Named("reason") @Greedy @Optional String reason
     ) {
         targetFuture.thenApplyAsync((target)-> {
@@ -73,7 +74,6 @@ public final class UnMuteCommand {
                 issuer.sendMsg(config.getMessage(MessageKeys.Punishments.Unmute.NOT_MUTED, Placeholder.unparsed("target", target.getTargetName())));
             }
         });
-
     }
 
 

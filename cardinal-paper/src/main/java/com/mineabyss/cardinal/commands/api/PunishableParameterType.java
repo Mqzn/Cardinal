@@ -8,7 +8,7 @@ import com.mineabyss.lib.commands.context.internal.CommandInputStream;
 import com.mineabyss.lib.commands.exception.ImperatException;
 import com.mineabyss.cardinal.api.punishments.Punishable;
 import com.mineabyss.cardinal.commands.api.exceptions.CardinalSourceException;
-import com.mineabyss.cardinal.punishments.core.PunishmentIDGenerator;
+import com.mineabyss.cardinal.util.PunishmentIDGenerator;
 import com.mineabyss.cardinal.punishments.target.PunishmentTargetFactory;
 import com.mineabyss.cardinal.util.IPUtils;
 import com.mineabyss.cardinal.util.TypeUtils;
@@ -47,9 +47,16 @@ public final class PunishableParameterType extends BaseParameterType<BukkitSourc
             CommandParameter<?> parameter = inputStream.currentParameter().orElseThrow();
             if(parameter.isAnnotated()
                     && parameter.asAnnotated().hasAnnotation(AllowsPunishmentID.class)
-                    && PunishmentIDGenerator.isValidPunishmentID(input)
+
             ) {
-                return PunishmentTargetFactory.punishmentID(input);
+                boolean isValidID = PunishmentIDGenerator.isValidPunishmentID(input);
+                System.out.println("Punishment ID: " + input + " is valid: " + isValidID);
+
+                if(isValidID) {
+                    return PunishmentTargetFactory.punishmentID(input.substring(1));
+                }
+            }else {
+                System.out.println("Punishment ID annotation not present or invalid punishment-id for input: " + input);
             }
 
             context.source().reply(

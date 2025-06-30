@@ -22,7 +22,7 @@ public interface QueryBuilder<T> {
     QueryBuilder<T> or();
     QueryBuilder<T> not();
     
-    QueryBuilder<T> sortBy(String field, SortOrder order);
+    QueryBuilder<T> sortBy(Class<?> sortEntityTypeClass, String field, SortOrder order);
     QueryBuilder<T> limit(int limit);
     QueryBuilder<T> skip(int skip);
     

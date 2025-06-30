@@ -79,7 +79,6 @@ public class BanListener implements Listener {
     private LoginResult processBanPunishment(Punishment<?> punishment, String playerName) {
         try {
             // Handle permanent bans
-            System.out.println("Punishment");
             if (punishment.isPermanent()) {
                 return LoginResult.deny(PunishmentMessageUtil.getBanKickMessage(punishment));
             }

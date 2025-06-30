@@ -148,6 +148,6 @@ public final class MongoStorageEngine implements StorageEngine {
                 .map((r)-> (Repository<?, T>)r)
                 .collect(Collectors.toList());
 
-        return new MultiRepositoryQueryBuilder<>(matchingRepos, entityClass, metrics);
+        return new MultiRepositoryQueryBuilder<>(matchingRepos, metrics);
     }
 }

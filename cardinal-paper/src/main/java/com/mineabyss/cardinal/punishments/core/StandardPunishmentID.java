@@ -1,6 +1,7 @@
 package com.mineabyss.cardinal.punishments.core;
 
 import com.mineabyss.cardinal.api.punishments.PunishmentID;
+import com.mineabyss.cardinal.util.PunishmentIDGenerator;
 import org.jetbrains.annotations.NotNull;
 
 public final class StandardPunishmentID implements PunishmentID {

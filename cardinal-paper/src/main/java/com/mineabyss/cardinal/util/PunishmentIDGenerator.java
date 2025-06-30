@@ -1,4 +1,4 @@
-package com.mineabyss.cardinal.punishments.core;
+package com.mineabyss.cardinal.util;
 
 import lombok.experimental.UtilityClass;
 
@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 @UtilityClass
 public final class PunishmentIDGenerator {
-    private static final Pattern PUNISHMENT_ID_PATTERN = Pattern.compile("^[0-9A-F]{8}$");
+    private static final String ID_PREFIX = "#";
     private final static AtomicInteger counter = new AtomicInteger(0);
 
     public static String generateNewID() {
@@ -31,6 +31,7 @@ public final class PunishmentIDGenerator {
      * @return true if the string matches the basic punishment ID format, false otherwise
      */
     public static boolean isValidPunishmentID(String id) {
-        return id != null && PUNISHMENT_ID_PATTERN.matcher(id).matches();
+        return id != null && id.startsWith(ID_PREFIX) && id.length() == 9 &&
+                Pattern.matches(ID_PREFIX + "[0-9A-F]{8}", id);
     }
 }

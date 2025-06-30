@@ -76,6 +76,7 @@ public interface PunishmentHistoryService {
      */
     FutureOperation<Deque<Punishment<?>>> getPunishmentsByPunisher(PunishmentIssuer issuer, int limit);
 
+
     /**
      * Searches for punishments containing specific text in their reason.
      *
@@ -85,6 +86,38 @@ public interface PunishmentHistoryService {
      * @throws IllegalArgumentException if searchTerm is null or empty
      */
     FutureOperation<Deque<Punishment<?>>> getPunishmentsByReason(String searchTerm, int limit);
+
+
+    /**
+     * Searches for a punishment record by its unique identifier and type.
+     * <p>
+     * This method performs an asynchronous lookup of a punishment record using the provided
+     * punishment ID and type. The operation returns a Future that will complete with the punishment
+     * data once the search operation finishes.
+     *
+     * @param punishmentID the unique identifier of the punishment to search for.
+     *                     Must not be null.
+     * @param type the type of the punishment to search for.
+     *             Must not be null.
+     * @return a Future that will complete with the PunishmentOperation result.
+     *         The Future may be complete with:
+     *         - A successful result containing the punishment data if found
+     *         - An empty result if no punishment with the given ID exists
+     *         - An exceptional result if the search operation fails
+     *
+     * @throws IllegalArgumentException if punishmentID or type is null
+     *
+     * @since 1.0.0
+     *
+     * @apiNote This method is asynchronous and should be handled appropriately.
+     *          Consider using CompletableFuture methods like thenAccept(),
+     *          thenApply(), or exceptionally() to handle the result.
+     *
+     * @implNote The actual search implementation may involve database queries,
+     *           file system operations, or network requests depending on the
+     *           underlying storage mechanism.
+     */
+    FutureOperation<Optional<Punishment<?>>> getPunishmentByID(PunishmentID punishmentID, PunishmentType type);
 
     /**
      * Searches for a punishment record by its unique identifier.
@@ -126,12 +159,12 @@ public interface PunishmentHistoryService {
     FutureOperation<Deque<Punishment<?>>> getExpiringPunishments(Duration duration);
 
     /**
-     * Retrieves punishments issued within a specific time range.
+     * Retrieves punishments issued between two specific timestamps.
      *
-     * @param from the start time (inclusive)
-     * @param to the end time (inclusive)
+     * @param from  the start time (inclusive)
+     * @param to    the end time (inclusive)
      * @param limit the maximum number of results to return, or -1 for no limit
-     * @return a {@link FutureOperation} containing punishments issued within the time range
+     * @return a {@link FutureOperation} containing punishments issued between the specified times
      * @throws IllegalArgumentException if from or to is null, or from is after to
      */
     FutureOperation<Deque<Punishment<?>>> getPunishmentsIssuedBetween(Instant from, Instant to, int limit);

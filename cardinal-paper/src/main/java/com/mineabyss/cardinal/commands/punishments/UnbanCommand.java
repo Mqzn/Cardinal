@@ -2,11 +2,11 @@ package com.mineabyss.cardinal.commands.punishments;
 
 import com.mineabyss.cardinal.util.Pair;
 import com.mineabyss.lib.commands.annotations.Command;
+import com.mineabyss.lib.commands.annotations.Default;
 import com.mineabyss.lib.commands.annotations.Dependency;
 import com.mineabyss.lib.commands.annotations.Description;
 import com.mineabyss.lib.commands.annotations.Greedy;
 import com.mineabyss.lib.commands.annotations.Named;
-import com.mineabyss.lib.commands.annotations.Optional;
 import com.mineabyss.lib.commands.annotations.Permission;
 import com.mineabyss.lib.commands.annotations.Usage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -41,7 +41,7 @@ public class UnbanCommand {
     public void exec(
             PunishmentIssuer issuer,
             @Named("user") @AllowsPunishmentID CompletableFuture<Punishable<?>> targetFuture,
-            @Optional @Greedy @Named("reason") String reason) {
+            @Default("Appealed") @Greedy @Named("reason") String reason) {
 
         targetFuture.thenApplyAsync((target)-> {
             java.util.Optional<Punishment<?>> punishmentContainer =  target.fetchPunishment(StandardPunishmentType.BAN).unwrap().join();

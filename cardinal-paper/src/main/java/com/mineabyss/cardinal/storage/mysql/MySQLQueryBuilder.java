@@ -124,7 +124,7 @@ public class MySQLQueryBuilder<T> implements QueryBuilder<T> {
     }
     
     @Override
-    public QueryBuilder<T> sortBy(String field, QueryBuilder.SortOrder order) {
+    public QueryBuilder<T> sortBy(Class<?> sortEntityTypeClass, String field, QueryBuilder.SortOrder order) {
         this.orderBy = "JSON_EXTRACT(data, '$.%s') %s".formatted(field, order.name());
         return this;
     }

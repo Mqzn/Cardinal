@@ -131,7 +131,7 @@ public final class MongoQueryBuilder<T> implements QueryBuilder<T> {
     }*/
 
     @Override
-    public QueryBuilder<T> sortBy(String field, SortOrder order) {
+    public QueryBuilder<T> sortBy(Class<?> sortEntityTypeClass, String field, SortOrder order) {
         int sortOrder = order == SortOrder.ASC ? 1 : -1;
         sorts.add(new Document(field, sortOrder));
         return this;

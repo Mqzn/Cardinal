@@ -1,6 +1,5 @@
 package com.mineabyss.cardinal.storage;
 
-import com.mineabyss.lib.commands.util.TypeWrap;
 import com.mineabyss.cardinal.api.storage.DBEntity;
 import com.mineabyss.cardinal.api.storage.QueryBuilder;
 import com.mineabyss.cardinal.api.storage.Repository;
@@ -16,7 +15,6 @@ import java.util.stream.Collectors;
 public final class MultiRepositoryQueryBuilder<T extends DBEntity<?>> implements QueryBuilder<T> {
 
     private final List<Repository<?, T>> repositories;
-    private final TypeWrap<T> entityClass;
     private final StorageMetrics metrics;
     private final List<QueryBuilder<T>> builders;
 
@@ -26,13 +24,13 @@ public final class MultiRepositoryQueryBuilder<T extends DBEntity<?>> implements
     private int limitValue = -1;
     private int skipValue = 0;
 
+    private Class<?> sortEntityTypeClass = null;
+
     public MultiRepositoryQueryBuilder(
             List<Repository<?, T>> repositories,
-            TypeWrap<T> entityClass,
             StorageMetrics metrics
     ) {
         this.repositories = repositories;
-        this.entityClass = entityClass;
         this.metrics = metrics;
         this.builders = new ArrayList<>();
 
@@ -121,10 +119,11 @@ public final class MultiRepositoryQueryBuilder<T extends DBEntity<?>> implements
     }
 
     @Override
-    public QueryBuilder<T> sortBy(String field, SortOrder order) {
+    public QueryBuilder<T> sortBy(Class<?> sortEntityTypeClass, String field, SortOrder order) {
+        this.sortEntityTypeClass = sortEntityTypeClass;
         this.sortField = field;
         this.sortOrder = order;
-        applyOperation(b -> b.sortBy(field, order));
+        applyOperation(b -> b.sortBy(sortEntityTypeClass, field, order));
         return this;
     }
 
@@ -203,7 +202,7 @@ public final class MultiRepositoryQueryBuilder<T extends DBEntity<?>> implements
         if (sortField != null && sortOrder != null) {
             results.sort((a, b) -> {
                 try {
-                    java.lang.reflect.Field field = entityClass.getRawType().getDeclaredField(sortField);
+                    java.lang.reflect.Field field = sortEntityTypeClass.getDeclaredField(sortField);
                     field.setAccessible(true);
                     Comparable valA = (Comparable) field.get(a);
                     Comparable valB = (Comparable) field.get(b);

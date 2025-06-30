@@ -99,11 +99,11 @@ punishments:
     success: "<prefix> <green>✔ Warning issued to <yellow><punishment_target></yellow> | Reason: <#ffa500><punishment_reason></#ffa500>"
 
   unban:
-    not_banned: "<prefix> <dark_red>ERROR: <red>Player '<target>' is not banned or doesn't exist!"
-    success: "<prefix> <gray>Unbanned player <green> '<target>'"
+    not_banned: "<prefix> <dark_red>ERROR: <red>Target '<target>' is not banned or doesn't exist!"
+    success: "<prefix> <gray>Unbanned target <green>'<target>'"
   unmute:
-    not_muted: "<prefix> <dark_red>ERROR: <red>Player '<target>' is not muted or doesn't exist!"
-    success: "<prefix> <gray>Unmuted player <green> '<target>'"
+    not_muted: "<prefix> <dark_red>ERROR: <red>Target '<target>' is not muted or doesn't exist!"
+    success: "<prefix> <gray>Unmuted target <green>'<target>'"
 
   commands:
     no_permission: "<red>❌ You don't have permission to use this command!"

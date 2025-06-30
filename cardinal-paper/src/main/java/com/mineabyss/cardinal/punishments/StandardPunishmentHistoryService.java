@@ -2,6 +2,7 @@ package com.mineabyss.cardinal.punishments;
 
 import static com.mineabyss.cardinal.punishments.StandardPunishmentManager.PUNISHMENT_TYPE_WRAP;
 
+import com.mineabyss.cardinal.Cardinal;
 import com.mineabyss.cardinal.api.punishments.Punishable;
 import com.mineabyss.cardinal.api.punishments.Punishment;
 import com.mineabyss.cardinal.api.punishments.PunishmentID;
@@ -18,6 +19,7 @@ import com.mineabyss.cardinal.api.storage.Repository;
 import com.mineabyss.cardinal.api.storage.StorageEngine;
 import com.mineabyss.cardinal.api.storage.StorageException;
 import com.mineabyss.cardinal.api.util.FutureOperation;
+import com.mineabyss.cardinal.punishments.core.StandardPunishment;
 import org.apache.commons.lang3.Validate;
 import java.time.Duration;
 import java.time.Instant;
@@ -211,6 +213,31 @@ final class StandardPunishmentHistoryService implements PunishmentHistoryService
         );
     }
 
+    @Override
+    public FutureOperation<Optional<Punishment<?>>> getPunishmentByID(PunishmentID punishmentID, PunishmentType type) {
+        return FutureOperation.of(
+                CompletableFuture.supplyAsync(()-> {
+
+                    return manager.getActivePunishmentByID(punishmentID)
+                            .filter(punishment -> punishment.getType() == type)
+                            .or(() -> {
+                                try {
+                                    Cardinal.log("Searching for punishment in database with ID: " + punishmentID.getRepresentation());
+                                    return manager.getEngine().getRepositoryOrCreate(type.name().toLowerCase(), PUNISHMENT_TYPE_WRAP)
+                                            .query()
+                                            .where("id")
+                                            .eq(punishmentID.getRepresentation())
+                                            .findFirst();
+                                } catch (StorageException e) {
+                                    e.printStackTrace();
+                                    return Optional.empty();
+                                }
+                            });
+                })
+
+        );
+    }
+
     /**
      * Searches for a punishment record by its unique identifier.
      * <p>
@@ -239,20 +266,24 @@ final class StandardPunishmentHistoryService implements PunishmentHistoryService
         return FutureOperation.of(
                 CompletableFuture.supplyAsync(()-> {
                     Optional<Punishment<?>> punishment = manager.getActivePunishmentByID(punishmentID);
-                    if(punishment.isPresent())
+                    if(punishment.isPresent()) {
+                        Cardinal.log("Searching for punishment in active cache with ID: " + punishmentID.getRepresentation());
                         return punishment;
+                    }
 
-                    for(var repo : manager.getPunishmentRepositories()) {
-                        try {
-                            Optional<Punishment<?>> container = repo.query().where("id")
-                                    .eq(punishmentID.getRepresentation()).findFirst();
-                            if(container.isPresent()) {
-                                return container;
-                            }
+                    try {
+                        Cardinal.log("Searching for punishment in database with ID: " + punishmentID.getRepresentation());
+                        Optional<Punishment<?>> container = manager.getEngine().queryAcrossRepositories(PUNISHMENT_TYPE_WRAP)
+                                .where("id")
+                                .eq(punishmentID.getRepresentation())
+                                .findFirst();
 
-                        } catch (StorageException e) {
-                            e.printStackTrace();
+                        if(container.isPresent()) {
+                            return container;
                         }
+
+                    } catch (StorageException e) {
+                        e.printStackTrace();
                     }
 
                     return Optional.empty();
@@ -288,7 +319,7 @@ final class StandardPunishmentHistoryService implements PunishmentHistoryService
                                             .and()
                                             .gte(now)
                                             .lte(windowEnd)
-                                            .sortBy("expiresAt", QueryBuilder.SortOrder.ASC)
+                                            .sortBy(StandardPunishment.class, "expiresAt", QueryBuilder.SortOrder.ASC)
                                             .execute()
                             );
                         } catch (StorageException e) {
@@ -303,14 +334,13 @@ final class StandardPunishmentHistoryService implements PunishmentHistoryService
 
     }
 
-
     /**
-     * Retrieves punishments that expired within a specific time range.
+     * Retrieves punishments issued between two specific timestamps.
      *
      * @param from  the start time (inclusive)
      * @param to    the end time (inclusive)
      * @param limit the maximum number of results to return, or -1 for no limit
-     * @return a {@link FutureOperation} containing punishments that expired within the time range
+     * @return a {@link FutureOperation} containing punishments issued between the specified times
      * @throws IllegalArgumentException if from or to is null, or from is after to
      */
     @Override
@@ -318,12 +348,12 @@ final class StandardPunishmentHistoryService implements PunishmentHistoryService
         return FutureOperation.of(
                 engine.queryAcrossRepositories(PUNISHMENT_TYPE_WRAP)
                         .where("issuedAt")
-                        .gte(from)
+                        .gte(from.toEpochMilli())
                         .and()
                         .where("issuedAt")
-                        .lte(to)
-                        .sortBy("issuedAt", QueryBuilder.SortOrder.DESC)
+                        .lte(to.toEpochMilli())
                         .limit(limit)
+                        .sortBy(StandardPunishment.class, "issuedAt", QueryBuilder.SortOrder.DESC)
                         .executeAsync()
                         .thenApply(ArrayDeque::new));
     }
@@ -349,11 +379,14 @@ final class StandardPunishmentHistoryService implements PunishmentHistoryService
         return FutureOperation.of(
                 engine.queryAcrossRepositories(PUNISHMENT_TYPE_WRAP)
                         .where("expiresAt")
+                        .ne(null)
+                        .and()
+                        .where("expiresAt")
                         .gte(from)
                         .and()
                         .where("expiresAt")
                         .lte(to)
-                        .sortBy("expiresAt", QueryBuilder.SortOrder.ASC)
+                        .sortBy(StandardPunishment.class, "expiresAt", QueryBuilder.SortOrder.ASC)
                         .limit(limit)
                         .executeAsync()
                         .thenApply(ArrayDeque::new)
@@ -377,8 +410,9 @@ final class StandardPunishmentHistoryService implements PunishmentHistoryService
             throw new IllegalArgumentException("Duration cannot be negative");
         }
 
-        Instant since = Instant.now().minus(duration);
-        return getPunishmentsIssuedBetween(since, Instant.now(), limit);
+        Instant now = Instant.now();
+        Instant since = now.minus(duration);
+        return getPunishmentsIssuedBetween(since, now, limit);
     }
 
     /**
@@ -435,7 +469,7 @@ final class StandardPunishmentHistoryService implements PunishmentHistoryService
         }
 
         return FutureOperation.of(
-                query.sortBy("issuedAt", QueryBuilder.SortOrder.DESC)
+                query.sortBy(StandardPunishment.class, "issuedAt", QueryBuilder.SortOrder.DESC)
                         .limit(limit)
                         .executeAsync()
                         .thenApply(ArrayDeque::new)
@@ -472,7 +506,7 @@ final class StandardPunishmentHistoryService implements PunishmentHistoryService
         }
 
         return FutureOperation.of(
-                query.sortBy("issuedAt", QueryBuilder.SortOrder.DESC)
+                query.sortBy(StandardPunishment.class, "issuedAt", QueryBuilder.SortOrder.DESC)
                         .limit(limit)
                         .executeAsync()
                         .thenApply(ArrayDeque::new)
@@ -497,7 +531,7 @@ final class StandardPunishmentHistoryService implements PunishmentHistoryService
         }
 
         return FutureOperation.of(
-                query.sortBy("issuedAt", QueryBuilder.SortOrder.DESC)
+                query.sortBy(StandardPunishment.class, "issuedAt", QueryBuilder.SortOrder.DESC)
                         .limit(limit)
                         .executeAsync()
                         .thenApply(ArrayDeque::new)
@@ -697,7 +731,7 @@ final class StandardPunishmentHistoryService implements PunishmentHistoryService
                     }
 
                     List<Punishment<?>> punishments = query
-                            .sortBy("issuedAt", QueryBuilder.SortOrder.DESC)
+                            .sortBy(StandardPunishment.class, "issuedAt", QueryBuilder.SortOrder.DESC)
                             .limit(limit)
                             .execute();
 
@@ -741,7 +775,7 @@ final class StandardPunishmentHistoryService implements PunishmentHistoryService
 
                     results.addAll(
                             query
-                                    .sortBy("issuedAt", QueryBuilder.SortOrder.DESC)
+                                    .sortBy(StandardPunishment.class, "issuedAt", QueryBuilder.SortOrder.DESC)
                                     .limit(limit)
                                     .execute()
                     );
@@ -772,7 +806,7 @@ final class StandardPunishmentHistoryService implements PunishmentHistoryService
             query.where("target").eq(playerId.toString());
         }
 
-        query.sortBy("issuedAt", QueryBuilder.SortOrder.DESC);
+        query.sortBy(StandardPunishment.class, "issuedAt", QueryBuilder.SortOrder.DESC);
 
         if(limit > 0) {
             query.limit(limit);
