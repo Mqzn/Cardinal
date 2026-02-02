@@ -87,7 +87,7 @@ tasks.shadowJar {
     destinationDirectory = project.rootProject.properties["outputDir"]?.let { file(it) }?.let { file(it) }
     archiveFileName.set("Cardinal-${project.version}.jar")
 
-    relocate("com.github.benmanes", "net.mineabyss.core.lib.caffeine")
+    relocate("com.github.benmanes", "eg.mqzen.lib.caffeine")
 }
 
 tasks.processResources {
