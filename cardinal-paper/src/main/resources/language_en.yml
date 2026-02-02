@@ -1,5 +1,5 @@
-primary_color: "<gray>"
-secondary_color: "<red>"
+primary_color: "<gray>" # represented by the tag "<pc>"
+secondary_color: "<red>" # represented by the tag "<sc>"
 prefix: "<gradient:#c61313:#400040>Cardinal</gradient> <dark_gray>»"
 
 punishments:

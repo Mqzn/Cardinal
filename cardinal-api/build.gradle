@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = 'net.mineabyss'
+group = 'eg.mqzen'
 version = '1.0'
 
 repositories {
@@ -15,6 +15,6 @@ repositories {
 
 dependencies {
 
-    compileOnly(files("libs/MineAbyssLib-1.0b1.jar"))
-    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly(files("libs/MLib-1.0b1.jar"))
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
 }

@@ -1,6 +1,6 @@
 name: Cardinal
 version: "${version}"
-main: com.mineabyss.cardinal.Cardinal
+main: eg.mqzen.cardinal.Cardinal
 description: Official core for MineAbyss
 api-version: '1.21.4'
 dependencies:

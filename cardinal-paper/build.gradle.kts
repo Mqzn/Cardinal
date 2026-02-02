@@ -3,10 +3,10 @@ import io.papermc.paperweight.userdev.ReobfArtifactConfiguration
 plugins {
     id("java")
     id("com.gradleup.shadow") version "9.0.0-beta12"
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.16"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
 }
 
-group = "com.mineabyss"
+group = "eg.mqzen"
 version = "1.0"
 
 tasks.compileJava {
@@ -42,8 +42,8 @@ repositories {
 dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
 
-    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
-    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
 
     implementation(project(":cardinal-api"))
 
@@ -56,7 +56,7 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.30")
     annotationProcessor("org.projectlombok:lombok:1.18.30")
 
-    compileOnly(files("libs/MineAbyssLib-1.0b1.jar"))
+    compileOnly(files("libs/MLib-1.0b1.jar"))
 }
 
 

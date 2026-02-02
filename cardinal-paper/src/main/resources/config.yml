@@ -16,3 +16,17 @@ storage:
     maxLifetime: 1800000
     autoCommit: false
 default-reason: "Breaking Server Rules"
+mute-blocked-commands:
+- "/say"
+- "/me"
+- "/msg"
+- "/tell"
+- "/whisper"
+- "/w"
+- "/r"
+- "/reply"
+- "/broadcast"
+- "/bc"
+- "/announce"
+- "/a"
+- "/alert"
