@@ -1,4 +1,4 @@
-# Cardinal Core:
+# Cardinal
 Cardinal is a professional punishment managing plugin designed to gather every essential moderation feature into one powerful suite.
 
 ## Setup Instructions
