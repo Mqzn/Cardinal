@@ -4,9 +4,7 @@ Cardinal is a professional punishment managing plugin designed to gather every e
 ## Setup Instructions
 1. **Download the Plugin**: Obtain the latest version of [Cardinal](https://github.com/Mqzn/Cardinal/releases/tag/v1.0.0)
 2. **Install the Plugin**: Place the downloaded `.jar` file into your server's `plugins` directory.
-3. **Download Dependencies**: Ensure your server is running Paper v1.21.11 or higher, Java 21 or higher, and download [MLib](https://github.com/Mqzn/Cardinal/releases/tag/v1.0.0) jar and place it in 
-   your `plugins` directory.
-4. **Restart the Server**: Restart your Minecraft server to load the plugin.
+3. **Restart the Server**: Restart your Minecraft server to load the plugin.
 
 ## Punishments system
 A comprehensive and easy-to-use punishment plugin for Minecraft servers, designed to help administrators manage player behavior efficiently.
