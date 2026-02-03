@@ -17,11 +17,6 @@ public final class PunishmentMessageUtil {
 
         final Component bcMsg = Cardinal.getInstance().getMessagesConfig().getMessage(silent ? silentKey : key, punishment.asTagResolver());
         if(silent) {
-            if(!punishment.getIssuer().hasPermission(CardinalPermissions.USE_SILENT_FLAG_PERMISSION)) {
-                punishment.getIssuer().sendMsg("<red>You do not have permission to use the silent flag!");
-                return;
-            }
-
             punishment.getIssuer().sendMsg(bcMsg);
         }else {
             Bukkit.broadcast(

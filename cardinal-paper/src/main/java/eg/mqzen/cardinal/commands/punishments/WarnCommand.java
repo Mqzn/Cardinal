@@ -1,6 +1,7 @@
 package eg.mqzen.cardinal.commands.punishments;
 
 import eg.mqzen.cardinal.Cardinal;
+import eg.mqzen.cardinal.CardinalPermissions;
 import eg.mqzen.cardinal.api.config.MessageConfig;
 import eg.mqzen.cardinal.api.config.MessageKey;
 import eg.mqzen.cardinal.api.punishments.Punishable;
@@ -11,7 +12,6 @@ import eg.mqzen.cardinal.commands.api.CardinalSource;
 import eg.mqzen.cardinal.config.MessageKeys;
 import eg.mqzen.cardinal.util.Pair;
 import eg.mqzen.cardinal.util.PunishmentMessageUtil;
-
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import studio.mevera.imperat.BukkitSource;
 import studio.mevera.imperat.annotations.Command;
@@ -45,6 +45,10 @@ public class WarnCommand {
             @Switch({"silent", "s"}) boolean silent,
             @Optional @Greedy String reason
     ) {
+        if(!issuer.hasPermission(CardinalPermissions.USE_SILENT_FLAG_PERMISSION)) {
+            issuer.sendMsg("<red>You do not have permission to use the silent flag!");
+            return;
+        }
 
         String warnReason;
         if (reason == null) {

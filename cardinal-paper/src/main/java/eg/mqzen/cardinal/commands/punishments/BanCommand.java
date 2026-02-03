@@ -57,6 +57,10 @@ public class BanCommand {
             @Named("reason") @Greedy @DefaultProvider(DefaultReasonProvider.class) @NotNull String reason
     ) {
         // /ban <player> [-s] [duration] [reason]
+        if(silent && !issuer.hasPermission(CardinalPermissions.USE_SILENT_FLAG_PERMISSION)) {
+            issuer.sendMsg("<red>You do not have permission to use the silent flag!");
+            return;
+        }
 
         // Use thenCombine to combine target and punishment container without Pair
         targetFuture.thenCombine(
@@ -67,6 +71,7 @@ public class BanCommand {
                 ),
                 (target, punishmentContainer) -> {
                     // Process the ban logic with both target and punishmentContainer
+
                     if (punishmentContainer.isPresent()) {
                         if (issuer.hasPermission(CardinalPermissions.OVERRIDE_PUNISHMENTS_PERMISSION)) {
                             // Override existing punishment

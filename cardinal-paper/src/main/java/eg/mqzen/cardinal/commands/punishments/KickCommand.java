@@ -47,6 +47,10 @@ public class KickCommand {
             @Switch("silent") boolean silent,
             @Named("reason") @DefaultProvider(DefaultReasonProvider.class) @Greedy String reason
     ) {
+        if(silent && !issuer.hasPermission(CardinalPermissions.USE_SILENT_FLAG_PERMISSION)) {
+            issuer.sendMsg("<red>You do not have permission to use the silent flag!");
+            return;
+        }
         Cardinal.getInstance().getPunishmentManager()
                 .applyPunishment(StandardPunishmentType.KICK, issuer, PunishmentTargetFactory.playerTarget(player), Duration.ZERO, reason)
                 .onSuccess((punishment)-> {

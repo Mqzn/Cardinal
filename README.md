@@ -11,6 +11,34 @@ A comprehensive and easy-to-use punishment plugin for Minecraft servers, designe
 
 ### ✨Initial Features
 
+#### Commands
+
+| Syntax | Description | Permission |
+|---|---|---|
+| `/ban <player> [-s] [duration] [reason...]` | Bans a player from the server. | `cardinal.punishments.ban` |
+| `/unban <user> [reason...]` | Unbans a player from the server. | `cardinal.punishments.unban` |
+| `/mute <user> [-s] [duration] [reason]` | Mutes a player on the server. | `cardinal.punishments.mute` |
+| `/unmute <target> [reason...]` | Unmutes a player on the server. | `cardinal.punishments.unmute` |
+| `/kick <user> [-s] [reason...]` | Kicks a player from the server. | `cardinal.punishments.kick` |
+| `/warn <user> [-s] [reason...]` | Issues a warning to a player. | *(no base permission annotation yet; see notes below)* |
+| `/history` | Opens the punishment history GUI (recent punishments). | *(no base permission annotation yet)* |
+
+##### Permissions
+
+| Permission | What it allows | Used by |
+|---|---|---|
+| `cardinal.punishments.ban` | Use the `/ban` command. | `/ban` |
+| `cardinal.punishments.unban` | Use the `/unban` command. | `/unban` |
+| `cardinal.punishments.mute` | Use the `/mute` command. | `/mute` |
+| `cardinal.punishments.unmute` | Use the `/unmute` command. | `/unmute` |
+| `cardinal.punishments.kick` | Use the `/kick` command. | `/kick` |
+| `cardinal.punishments.silent` | Use the silent flag (`-s` / `--silent`) on supported commands. | `/ban -s`, `/kick -s` *(only checked when `-s` is used)*; `/mute`, `/warn` *(currently checked even when `-s` isn’t used)* |
+| `cardinal.punishments.override` | Override/update an existing active punishment (e.g., change duration/reason on an already-muted/banned target). | `/ban`, `/mute` when target is already punished |
+| `cardinal.punishments.notify` | Receive staff notifications about punishments. | Punishment broadcasts/notifications (staff-facing) |
+
+> Notes:
+> - `warn` and `history` currently have **no base `@Permission(...)` annotation** in code, so access depends on the command framework defaults and your server’s permission setup.
+
   ✅ Temporary Mute Command: Mute a player for a specified duration with an optional reason.
 
   ✅ Permanent Mute Command: Permanently mute a player with an optional reason.

@@ -54,6 +54,10 @@ public class MuteCommand {
             @Named("duration") @Optional Duration duration,
             @Named("reason") @DefaultProvider(DefaultReasonProvider.class) String reason
     ) {
+        if(!issuer.hasPermission(CardinalPermissions.USE_SILENT_FLAG_PERMISSION)) {
+            issuer.sendMsg("<red>You do not have permission to use the silent flag!");
+            return;
+        }
         targetFuture.thenCompose((target)-> {
             return target.fetchPunishment(StandardPunishmentType.MUTE)
                     .onError(Throwable::printStackTrace)
@@ -113,8 +117,6 @@ public class MuteCommand {
             issuer.sendMsg(config.getMessage(punishment.isPermanent() ? Mute.SUCCESS : Mute.SUCCESS_TEMPORARY, punishment.asTagResolver()));
 
         });
-
-
     }
 
 
